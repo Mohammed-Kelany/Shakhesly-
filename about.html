@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عن شخصلي - منصة ذكية لاكتشاف أعطال الأجهزة</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="شخصلي">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1E3A8A;
+            --white: #FFFFFF;
+            --gray-50: #F8FAFC;
+            --gray-100: #F1F5F9;
+            --gray-500: #64748B;
+            --gray-800: #1E293B;
+            --radius: 20px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.06);
+            --shadow-lg: 0 20px 50px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.8;
+        }
+        
+        /* ===== Header ===== */
+        .header {
+            background: var(--white);
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .nav a {
+            color: var(--gray-500);
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 20px;
+            transition: 0.3s;
+        }
+        
+        .nav a:hover, .nav a.active {
+            color: var(--primary);
+        }
+        
+        /* ===== Hero ===== */
+        .about-hero {
+            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .about-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
+        
+        .about-hero p {
+            font-size: 1.2rem;
+            color: var(--gray-500);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* ===== Story Section ===== */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--gray-800);
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--gray-500);
+            margin-bottom: 60px;
+            font-size: 1.1rem;
+        }
+        
+        /* ===== Story Card ===== */
+        .story-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .story-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .story-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        
+        .story-card p {
+            color: var(--gray-500);
+            line-height: 2;
+        }
+        
+        /* ===== Features Grid ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h4 {
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== Stats ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            margin: 40px auto 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--gray-500);
+        }
+        
+        /* ===== Team ===== */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .team-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .team-avatar {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .team-card h4 {
+            font-weight: 800;
+        }
+        
+        .team-card span {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* ===== CTA ===== */
+        .cta {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            padding: 60px 30px;
+            border-radius: var(--radius);
+            margin: 40px auto;
+            max-width: 800px;
+        }
+        
+        .cta h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: 0.3s;
+            margin: 8px;
+        }
+        
+        .btn-white {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-outline-white {
+            border: 2px solid white;
+            color: white;
+        }
+        
+        /* ===== Footer ===== */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray-500);
+        }
+        
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .features-grid, .team-grid, .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .about-hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .features-grid, .team-grid, .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== Header ========== -->
+    <header class="header">
+        <div class="container">
+            </div>
+            <a href="index.html" class="logo">
+                <img src="assets/images/logo.png" alt="شخصلي" style="max-width: 130px; height: auto; display: block; margin-right: 0; margin-left: auto;"> 
+                <!-- <img src="assets/images/logo.png" class="logo-img"> -->
+                <!-- <div class="logo-icon">🤖</div>
+                شخصلي -->
+            </a>
+            <nav class="nav">
+                <a href="index.html">الرئيسية</a>
+                <a href="diagnose.html">تشخيص عطل</a>
+                <a href="about.html" class="active">عن شخصلي</a>
+                <a href="login.html">تسجيل الدخول</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== Hero ========== -->
+    <section class="about-hero" data-aos="fade-up">
+        <div class="container">
+            <h1>عن شخصلي 🚀</h1>
+            <p>أول منصة ذكية في مصر لاكتشاف أعطال الأجهزة المنزلية وإدارتها باستخدام الذكاء الاصطناعي</p>
+        </div>
+    </section>
+
+    <!-- ========== قصتنا ========== -->
+    <section class="section" data-aos="fade-up">
+        <div class="container">
+            <div class="story-card">
+                <div class="story-icon">💡</div>
+                <h3>كيف بدأت شخصلي؟</h3>
+                <p>
+                    بدأت فكرة شخصلي من مشكلة يومية تواجه ملايين الأسر المصرية: 
+                    <strong>"الجهاز عطلان.. نصلحه ازاي؟ نكلم مين؟ هياخد كام؟"</strong>
+                    <br><br>
+                    قررنا بناء منصة تربط بين العملاء والفنيين المعتمدين، 
+                    وتستخدم الذكاء الاصطناعي لتشخيص الأعطال في ثوانٍ، 
+                    مع توفير قطع الغيار المطلوبة وأسعارها التقريبية.
+                    <br><br>
+                    هدفنا: <strong>نوفر وقتك ونريح بالك</strong>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== مميزاتنا ========== -->
+    <section class="section" style="background:white;" data-aos="fade-up">
+        <div class="container">
+            <h2 class="section-title">لماذا شخصلي؟</h2>
+            <p class="section-subtitle">مميزات تجعلنا الخيار الأول لإدارة أجهزتك المنزلية</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h4>ذكاء اصطناعي</h4>
+                    <p>تشخيص ذكي للأعطال خلال ثوانٍ باستخدام أحدث تقنيات الذكاء الاصطناعي</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍🔧</div>
+                    <h4>فنيون معتمدون</h4>
+                    <p>شبكة من الفنيين المحترفين المعتمدين في جميع المناطق</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h4>عروض تنافسية</h4>
+                    <p>احصل على عروض أسعار من أكثر من فني واختر الأنسب لك</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h4>تذكير بالصيانة</h4>
+                    <p>نذكرك تلقائياً بمواعيد الصيانة الدورية لكل جهاز</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h4>قطع الغيار</h4>
+                    <p>نوفر لك قائمة بقطع الغيار المطلوبة وأسعارها التقريبية</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h4>تقييم ومراجعات</h4>
+                    <p>قيم الخدمة وساعد غيرك في اختيار أفضل الفنيين</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== أرقامنا ========== -->
+    <section class="section" data-aos="fade-up">
+        <div class="container">
+            <h2 class="section-title">شخصلي في أرقام</h2>
+            <p class="section-subtitle">إحصائيات منصتنا</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">+350</div>
+                    <div class="stat-label">فني معتمد</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">+15,000</div>
+                    <div class="stat-label">تشخيص ناجح</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">نسبة رضا</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">دعم متواصل</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== فريق العمل ========== -->
+    <section class="section" style="background:white;" data-aos="fade-up">
+        <div class="container">
+            <h2 class="section-title">فريق شخصلي</h2>
+            <p class="section-subtitle">فريق شغوف بالتكنولوجيا وخدمة العملاء</p>
+            
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">👨‍💻</div>
+                    <h4>Mohamed Elkelany</h4>
+                    <span>المؤسس والمدير التنفيذي</span>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👩‍💻</div>
+                    <h4>Yazzan Elkelany</h4>
+                    <span>مديرة التقنية</span>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">👨‍🔧</div>
+                    <h4>Ahmed Elkelany</h4>
+                    <span>مدير عمليات الفنيين</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CTA ========== -->
+    <section class="section" data-aos="zoom-in">
+        <div class="container">
+            <div class="cta">
+                <h2>🚀 جاهز تبدأ رحلة الصيانة الذكية؟</h2>
+                <p style="margin-bottom:25px;opacity:0.9;">سجل الآن مجاناً وابدأ في إدارة أجهزتك بذكاء</p>
+                <a href="index.html#register" class="btn btn-white">ابدأ الآن مجاناً</a>
+                <a href="diagnose.html" class="btn btn-outline-white">شخّص جهازك</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== Footer ========== -->
+    <footer class="footer">
+        <p>&copy; 2024 شخصلي. جميع الحقوق محفوظة</p>
+    </footer>
+
+    <!-- AOS Animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+    </script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(registration) {
+                    console.log('✅ Service Worker مسجل بنجاح');
+                }).catch(function(error) {
+                    console.log('❌ فشل تسجيل Service Worker:', error);
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

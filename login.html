@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .login-container{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.15);width:100%;max-width:450px;padding:50px 40px;text-align:center}
+        .login-logo{font-size:3.5rem;margin-bottom:5px}
+        .login-title{font-size:1.8rem;font-weight:900;color:#1E3A8A;margin-bottom:5px}
+        .login-subtitle{color:#64748B;margin-bottom:35px}
+        .form-group{margin-bottom:20px;text-align:right}
+        .form-group label{display:block;font-weight:700;margin-bottom:8px;color:#334155}
+        .form-group input,.form-group select{width:100%;padding:14px 16px;border:2px solid #E2E8F0;border-radius:12px;font-family:'Cairo',sans-serif;font-size:1rem;background:#F8FAFC}
+        .form-group input:focus,.form-group select:focus{outline:none;border-color:#2563EB;background:#fff}
+        .btn{width:100%;padding:15px;border-radius:50px;border:none;font-family:'Cairo',sans-serif;font-weight:700;font-size:1.1rem;cursor:pointer;margin-top:10px}
+        .btn-primary{background:#2563EB;color:#fff}.btn-primary:hover{background:#1D4ED8}
+        .error-message{background:#FEE2E2;color:#EF4444;padding:12px;border-radius:10px;margin-bottom:15px;display:none}
+        .error-message.show{display:block}
+        .links{margin-top:20px}.links a{color:#2563EB;font-weight:700;text-decoration:none}
+        .back-link{display:block;margin-top:15px;color:#64748B;text-decoration:none}
+    </style>
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="شخصلي">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script> 
+</head>
+<body>
+    <div class="login-container">
+        <img src="assets/images/logo.png" alt="شخصلي" style="height:60px;"> 
+        <!-- <div class="login-logo">🤖</div>
+        <div class="login-title">شخصلي AI</div> -->
+        <p class="login-subtitle">سجل دخولك للوصول إلى حسابك</p>
+        <div class="error-message" id="errorMessage"></div>
+        <form id="loginForm">
+            <div class="form-group"><label for="userType">نوع الحساب</label><select id="userType" required><option value="">-- اختر --</option><option value="user">👤 مستخدم</option><option value="tech">🔧 فني</option></select></div>
+            <div class="form-group"><label for="email">البريد الإلكتروني</label><input type="email" id="email" required></div>
+            <div class="form-group"><label for="password">كلمة المرور</label><input type="password" id="password" required></div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+        </form>
+        <div class="links"><p>ليس لديك حساب؟ <a href="index.html">سجل الآن</a></p></div>
+        <a href="index.html" class="back-link">← العودة للرئيسية</a>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit',function(e){
+            e.preventDefault();
+            const userType=document.getElementById('userType').value;
+            const email=document.getElementById('email').value.trim().toLowerCase();
+            const password=document.getElementById('password').value;
+            const errorMsg=document.getElementById('errorMessage');
+            errorMsg.classList.remove('show');
+            
+            if(!userType){errorMsg.textContent='اختر نوع الحساب';errorMsg.classList.add('show');return}
+            if(!email||!password){errorMsg.textContent='أدخل البريد وكلمة المرور';errorMsg.classList.add('show');return}
+            const users=JSON.parse(localStorage.getItem('shakhesly_users'))||[];
+
+            const SECRET_KEY = 'ShakheslyAI2024SecretKey!@#';
+
+const user = users.find(u => {
+    if (u.email.toLowerCase() !== email || u.type !== userType) return false;
+    
+    // فك تشفير كلمة المرور المخزنة والمقارنة
+    try {
+        const decrypted = CryptoJS.AES.decrypt(u.password, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+        return decrypted === password;
+    } catch(e) {
+        // لو كانت كلمة مرور قديمة (مش مشفرة)
+        return u.password === password;
+    }
+}); 
+
+            if(user){
+                localStorage.setItem('shakhesly_current_user',JSON.stringify({id:user.id,fullName:user.fullName,email:user.email,phone:user.phone,type:user.type}));
+                window.location.href=user.type==='tech'?'dashboard-tech.html':'dashboard-user.html';
+            }else{errorMsg.textContent='بيانات الدخول غير صحيحة';errorMsg.classList.add('show')}
+        });
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script> 
+<!-- تسجيل Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('✅ Service Worker مسجل بنجاح');
+            }).catch(function(error) {
+                console.log('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
+    }
+</script> 
+<!-- CryptoJS للتشفير -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script> 
+
+
+</body>
+</html> 

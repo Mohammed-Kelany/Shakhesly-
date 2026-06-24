@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلباتي - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/orders.css">
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="شخصلي">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
+
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- ========== الشريط الجانبي ========== -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/images/logo.png" alt="شخصلي" style="max-width: 130px; height: auto; display: block; margin: 0 auto;">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="dashboard-user.html"><span><i class="fas fa-home"></i> الرئيسية</span></a>
+                <a href="diagnose.html"><span><i class="fas fa-stethoscope"></i> تشخيص عطل</span></a>
+                <a href="devices.html"><span><i class="fas fa-mobile-alt"></i> أجهزتي</span></a>
+                <a href="orders.html" class="active"><span><i class="fas fa-history"></i> طلباتي</span></a>
+                <a href="notifications.html"><span><i class="fas fa-bell"></i> الإشعارات</span><span class="notification-badge" id="sidebarBadge">0</span></a>
+                <a href="profile.html"><span><i class="fas fa-user"></i> الملف الشخصي</span></a>
+            </nav>
+            <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </aside>
+
+        <!-- ========== المحتوى الرئيسي ========== -->
+        <main class="main-content">
+            
+            <!-- رأس الصفحة -->
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1>📋 طلباتي</h1>
+                    <p>متابعة طلبات الصيانة وعروض الفنيين</p>
+                </div>
+                <a href="diagnose.html" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> طلب صيانة جديد
+                </a>
+            </div>
+
+            <!-- إحصائيات -->
+            <div class="stats-grid" data-aos="fade-up">
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-number" id="totalOrders">0</div>
+                    <div class="stat-label">إجمالي الطلبات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" id="pendingOrders">0</div>
+                    <div class="stat-label">قيد الانتظار</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔧</div>
+                    <div class="stat-number" id="inProgressOrders">0</div>
+                    <div class="stat-label">قيد التنفيذ</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="completedOrders">0</div>
+                    <div class="stat-label">مكتملة</div>
+                </div>
+            </div>
+
+            <!-- تبويبات الحالة -->
+            <div class="tabs" data-aos="fade-up">
+                <button class="tab active" data-filter="all">الكل</button>
+                <button class="tab" data-filter="pending">⏳ قيد الانتظار</button>
+                <button class="tab" data-filter="accepted">✅ مقبولة</button>
+                <button class="tab" data-filter="completed">✔️ مكتملة</button>
+                <button class="tab" data-filter="cancelled">❌ ملغية</button>
+            </div>
+
+            <!-- قائمة الطلبات -->
+            <div class="orders-list" id="ordersList" data-aos="fade-up">
+                <!-- الطلبات هتظهر هنا -->
+            </div>
+
+            <!-- رسالة لو مفيش طلبات -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📋</div>
+                <h2>لا توجد طلبات صيانة</h2>
+                <p>قم بتشخيص عطل جهازك وطلب فني للصيانة</p>
+                <a href="diagnose.html" class="btn btn-primary">
+                    <i class="fas fa-stethoscope"></i> تشخيص عطل جديد
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== نافذة تقييم الفني ========== -->
+    <div class="modal-overlay" id="ratingModal">
+        <div class="modal modal-sm">
+            <button class="modal-close" id="modalCloseRating">&times;</button>
+            <div class="modal-header">
+                <h3>⭐ تقييم الفني</h3>
+            </div>
+            <div class="modal-body">
+                <p>ما رأيك في خدمة الفني؟</p>
+                <div class="stars" id="starsRating">
+                    <span data-star="1">⭐</span>
+                    <span data-star="2">⭐</span>
+                    <span data-star="3">⭐</span>
+                    <span data-star="4">⭐</span>
+                    <span data-star="5">⭐</span>
+                </div>
+                <p style="text-align:center;font-weight:700;margin:10px 0;" id="ratingText">اختر تقييمك</p>
+                <textarea id="ratingComment" rows="3" placeholder="تعليقك (اختياري)..."></textarea>
+                <button class="btn btn-primary btn-block" id="btnSubmitRating">إرسال التقييم</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== نافذة تفاصيل الطلب ========== -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <button class="modal-close" id="modalCloseDetail">&times;</button>
+            <div class="modal-header">
+                <h3 id="detailTitle">تفاصيل الطلب</h3>
+            </div>
+            <div class="modal-body" id="detailContent">
+                <!-- المحتوى هيتضاف dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/orders.js"></script>
+    <script>
+        AOS.init({ duration: 600, once: true });
+        const user = JSON.parse(localStorage.getItem('shakhesly_current_user'));
+        if (!user) window.location.href = 'index.html';
+        const notifications = JSON.parse(localStorage.getItem('shakhesly_notifications')) || [];
+        const unread = notifications.filter(n => n.userId === user.id && !n.read).length;
+        const badge = document.getElementById('sidebarBadge');
+        if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline'; }
+    </script>
+    <!-- تسجيل Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('✅ Service Worker مسجل بنجاح');
+            }).catch(function(error) {
+                console.log('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
+    }
+</script> 
+
+</body>
+</html> 

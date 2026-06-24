@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/profile.css">
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="شخصلي">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
+
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- ========== الشريط الجانبي ========== -->
+        <aside class="sidebar">
+            <img src="assets/images/logo.png" class="logo-img">
+            <!-- المحتوى هيتضاف حسب نوع المستخدم -->
+        </aside>
+
+        <!-- ========== المحتوى الرئيسي ========== -->
+        <main class="main-content">
+            
+            <!-- رأس الصفحة -->
+            <div class="page-header">
+                <h1>👤 الملف الشخصي</h1>
+                <p>تعديل بيانات حسابك وإعداداتك</p>
+            </div>
+
+            <!-- تبويبات -->
+            <div class="tabs">
+                <button class="tab active" data-tab="info">📋 المعلومات الشخصية</button>
+                <button class="tab" data-tab="password">🔒 تغيير كلمة المرور</button>
+                <button class="tab" data-tab="settings">⚙️ الإعدادات</button>
+            </div>
+
+            <!-- ========== تبويب المعلومات الشخصية ========== -->
+            <div class="tab-content active" id="tab-info">
+                <div class="card">
+                    <div class="avatar-section">
+                        <div class="avatar" id="userAvatar">
+                            <span id="avatarInitial">U</span>
+                        </div>
+                        <div>
+                            <h2 id="displayName">اسم المستخدم</h2>
+                            <p id="displayEmail">email@example.com</p>
+                        </div>
+                    </div>
+
+                    <form id="infoForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName">الاسم الكامل</label>
+                                <input type="text" id="fullName" placeholder="أدخل اسمك الكامل" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">البريد الإلكتروني</label>
+                                <input type="email" id="email" placeholder="example@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">رقم الهاتف</label>
+                                <input type="tel" id="phone" placeholder="+20 1xx xxxxxxx" required>
+                            </div>
+                        </div>
+
+                        <!-- حقول خاصة بالفني -->
+                        <div id="techFields" style="display:none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="specialization">التخصص</label>
+                                    <select id="specialization">
+                                        <option value="">-- اختر التخصص --</option>
+                                        <option value="fridge">❄️ تبريد وتكييف</option>
+                                        <option value="washer">🌀 غسالات</option>
+                                        <option value="tv">📺 تلفزيونات وشاشات</option>
+                                        <option value="all">🔧 صيانة شاملة</option>
+                                        <option value="other">📦 أخرى</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="experience">سنوات الخبرة</label>
+                                    <input type="number" id="experience" placeholder="مثال: 5" min="0" max="50">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="location">منطقة الخدمة</label>
+                                <input type="text" id="location" placeholder="مثال: القاهرة - مدينة نصر">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="about">نبذة عنك</label>
+                                <textarea id="about" rows="4" placeholder="اكتب نبذة عن خبراتك وخدماتك..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> حفظ التغييرات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ========== تبويب تغيير كلمة المرور ========== -->
+            <div class="tab-content" id="tab-password">
+                <div class="card">
+                    <h3>🔒 تغيير كلمة المرور</h3>
+                    <p style="color:var(--gray-500);margin-bottom:25px;">أدخل كلمة المرور الحالية ثم كلمة المرور الجديدة</p>
+
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">كلمة المرور الحالية</label>
+                            <input type="password" id="currentPassword" placeholder="أدخل كلمة المرور الحالية" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPassword">كلمة المرور الجديدة</label>
+                            <input type="password" id="newPassword" placeholder="أدخل كلمة المرور الجديدة" required minlength="6">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">تأكيد كلمة المرور الجديدة</label>
+                            <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور الجديدة" required minlength="6">
+                        </div>
+
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                            <span id="strengthText">قوة كلمة المرور</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> تغيير كلمة المرور
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ========== تبويب الإعدادات ========== -->
+            <div class="tab-content" id="tab-settings">
+                <div class="card">
+                    <h3>⚙️ إعدادات الحساب</h3>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <strong>🔔 الإشعارات</strong>
+                            <p>تفعيل إشعارات طلبات الصيانة والتذكيرات</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notificationsEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <strong>📧 إشعارات البريد الإلكتروني</strong>
+                            <p>استقبال تحديثات الطلبات عبر البريد الإلكتروني</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailNotifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <strong>📱 إشعارات الصيانة الدورية</strong>
+                            <p>تذكير بمواعيد الصيانة الدورية للأجهزة</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenanceReminders" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="btnSaveSettings">
+                            <i class="fas fa-save"></i> حفظ الإعدادات
+                        </button>
+                    </div>
+                </div>
+
+                <!-- حذف الحساب -->
+                <div class="card danger-card">
+                    <h3>🗑️ منطقة الخطر</h3>
+                    <p style="color:var(--gray-500);margin-bottom:20px;">حذف حسابك نهائياً. لا يمكن التراجع عن هذا الإجراء.</p>
+                    <button class="btn btn-danger" id="btnDeleteAccount">
+                        <i class="fas fa-trash"></i> حذف الحساب
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== نافذة تأكيد حذف الحساب ========== -->
+    <div class="modal-overlay" id="deleteAccountModal">
+        <div class="modal modal-sm">
+            <button class="modal-close" id="modalCloseDelete">&times;</button>
+            <div class="modal-header">
+                <h3>⚠️ تأكيد حذف الحساب</h3>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد تماماً من حذف حسابك؟</p>
+                <p style="color:#EF4444;font-weight:700;">سيتم حذف جميع بياناتك نهائياً:</p>
+                <ul style="color:var(--gray-600);margin:15px 20px;line-height:2;">
+                    <li>❌ جميع أجهزتك المسجلة</li>
+                    <li>❌ جميع طلبات الصيانة</li>
+                    <li>❌ جميع التقييمات</li>
+                </ul>
+                <p style="color:#EF4444;font-weight:700;">لا يمكن التراجع عن هذا الإجراء!</p>
+                <div class="form-actions">
+                    <button class="btn btn-outline" id="btnCancelDelete">إلغاء</button>
+                    <button class="btn btn-danger" id="btnConfirmDelete">نعم، احذف حسابي</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/profile.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script> 
+<!-- تسجيل Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('✅ Service Worker مسجل بنجاح');
+            }).catch(function(error) {
+                console.log('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
+    }
+</script> 
+<!-- CryptoJS للتشفير -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script> 
+
+
+</body>
+</html> 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقييماتي - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/ratings.css">
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="شخصلي">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
+
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <img src="assets/images/logo.png" class="logo-img">
+            <!-- <div class="sidebar-logo">🔧 شخصلي</div> -->
+            <nav class="sidebar-menu">
+                <a href="dashboard-tech.html"><span><i class="fas fa-home"></i> الرئيسية</span></a>
+                <a href="incoming-orders.html"><span><i class="fas fa-tasks"></i> الطلبات الواردة</span></a>
+                <a href="ratings.html" class="active"><span><i class="fas fa-star"></i> تقييماتي</span></a>
+                <a href="notifications.html"><span><i class="fas fa-bell"></i> الإشعارات</span><span class="notification-badge" id="sidebarBadge">0</span></a>
+                <a href="profile.html"><span><i class="fas fa-cog"></i> الإعدادات</span></a>
+            </nav>
+            <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </aside>
+        <main class="main-content">
+            <div class="page-header"><h1>⭐ تقييماتي</h1><p>آراء العملاء وتقييماتهم</p></div>
+            <div class="rating-summary"><div class="summary-main"><div class="overall-rating"><span class="overall-number" id="overallRating">0.0</span><div class="overall-stars" id="overallStars">⭐⭐⭐⭐⭐</div><span class="overall-count" id="overallCount">0 تقييم</span></div></div><div class="summary-bars"><div class="bar-item"><span>5⭐</span><div class="bar-bg"><div class="bar-fill" id="bar5"></div></div><span id="count5">0</span></div><div class="bar-item"><span>4⭐</span><div class="bar-bg"><div class="bar-fill" id="bar4"></div></div><span id="count4">0</span></div><div class="bar-item"><span>3⭐</span><div class="bar-bg"><div class="bar-fill" id="bar3"></div></div><span id="count3">0</span></div><div class="bar-item"><span>2⭐</span><div class="bar-bg"><div class="bar-fill" id="bar2"></div></div><span id="count2">0</span></div><div class="bar-item"><span>1⭐</span><div class="bar-bg"><div class="bar-fill" id="bar1"></div></div><span id="count1">0</span></div></div></div>
+            <div class="stats-grid"><div class="stat-card"><div class="stat-icon">📋</div><div class="stat-number" id="totalCompleted">0</div><div class="stat-label">طلبات مكتملة</div></div><div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-number" id="totalRatings">0</div><div class="stat-label">تقييمات</div></div><div class="stat-card"><div class="stat-icon">💬</div><div class="stat-number" id="totalComments">0</div><div class="stat-label">تعليقات</div></div><div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-number" id="satisfactionRate">0%</div><div class="stat-label">نسبة الرضا</div></div></div>
+            <div class="filter-bar"><select id="filterRating" class="filter-select"><option value="all">كل التقييمات</option><option value="5">5⭐</option><option value="4">4⭐</option><option value="3">3⭐</option><option value="2">2⭐</option><option value="1">1⭐</option></select><select id="sortRatings" class="filter-select"><option value="newest">الأحدث</option><option value="highest">الأعلى</option></select></div>
+            <div class="ratings-list" id="ratingsList"></div>
+            <div class="empty-state" id="emptyState"><div class="empty-icon">⭐</div><h2>لا توجد تقييمات</h2><p>ستظهر بعد إكمال الطلبات</p></div>
+        </main>
+    </div>
+    <script src="js/ratings.js"></script>
+    <script>
+        const user=JSON.parse(localStorage.getItem('shakhesly_current_user'));
+        const notifications=JSON.parse(localStorage.getItem('shakhesly_notifications'))||[];
+        const unread=notifications.filter(n=>n.userId===user.id&&!n.read).length;
+        const badge=document.getElementById('sidebarBadge');
+        if(unread>0){badge.textContent=unread;badge.style.display='inline'}else{badge.style.display='none'}
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script> 
+<!-- تسجيل Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('✅ Service Worker مسجل بنجاح');
+            }).catch(function(error) {
+                console.log('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
+    }
+</script> 
+
+</body>
+</html> 

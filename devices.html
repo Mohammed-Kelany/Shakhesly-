@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أجهزتي - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/devices.css">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="شخصلي">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- ========== الشريط الجانبي ========== -->
+        <aside class="sidebar">
+            <img src="assets/images/logo.png" class="logo-img">
+            <!-- <div class="sidebar-logo">🤖 شخصلي</div> -->
+            <nav class="sidebar-menu">
+                <a href="dashboard-user.html"><span><i class="fas fa-home"></i> الرئيسية</span></a>
+                <a href="diagnose.html"><span><i class="fas fa-stethoscope"></i> تشخيص عطل</span></a>
+                <a href="devices.html" class="active"><span><i class="fas fa-mobile-alt"></i> أجهزتي</span></a>
+                <a href="orders.html"><span><i class="fas fa-history"></i> طلباتي</span></a>
+                <a href="notifications.html"><span><i class="fas fa-bell"></i> الإشعارات</span><span class="notification-badge" id="sidebarBadge">0</span></a>
+                <a href="profile.html"><span><i class="fas fa-user"></i> الملف الشخصي</span></a>
+            </nav>
+            <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </aside>
+
+        <!-- ========== المحتوى الرئيسي ========== -->
+        <main class="main-content">
+            
+            <!-- رأس الصفحة -->
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1>📱 أجهزتي</h1>
+                    <p>إدارة جميع أجهزتك المنزلية ومتابعة صيانتها</p>
+                </div>
+                <button class="btn btn-primary" id="btnAddDevice">
+                    <i class="fas fa-plus-circle"></i> إضافة جهاز جديد
+                </button>
+            </div>
+
+            <!-- إحصائيات -->
+            <div class="stats-grid" data-aos="fade-up">
+                <div class="stat-card">
+                    <div class="stat-icon">📱</div>
+                    <div class="stat-number" id="totalDevices">0</div>
+                    <div class="stat-label">إجمالي الأجهزة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="activeDevices">0</div>
+                    <div class="stat-label">أجهزة سليمة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔧</div>
+                    <div class="stat-number" id="needMaintenance">0</div>
+                    <div class="stat-label">تحتاج صيانة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-number" id="upcomingMaintenance">0</div>
+                    <div class="stat-label">صيانة قريبة</div>
+                </div>
+            </div>
+
+            <!-- فلتر البحث -->
+            <div class="filter-bar" data-aos="fade-up">
+                <input type="text" id="searchDevice" placeholder="🔍 بحث عن جهاز..." class="search-input">
+                <select id="filterType" class="filter-select">
+                    <option value="all">كل الأجهزة</option>
+                    <optgroup label="🏠 منزلية كبيرة">
+                        <option value="fridge">❄️ ثلاجة</option>
+                        <option value="freezer">🧊 ديب فريزر</option>
+                        <option value="washer">🌀 غسالة أتوماتيك</option>
+                        <option value="dryer">👕 مجفف ملابس</option>
+                        <option value="dishwasher">🍽️ غسالة أطباق</option>
+                        <option value="ac">🌬️ مكيف هواء</option>
+                        <option value="water-heater">💧 سخان مياه</option>
+                    </optgroup>
+                    <optgroup label="🍳 مطبخ">
+                        <option value="oven">🔥 فرن / بوتاجاز</option>
+                        <option value="microwave">📡 ميكروويف</option>
+                    </optgroup>
+                    <optgroup label="📺 إلكترونيات">
+                        <option value="tv">📺 تلفزيون</option>
+                        <option value="laptop">💻 لابتوب</option>
+                    </optgroup>
+                    <optgroup label="🚗 مركبات">
+                        <option value="car">🚗 سيارة</option>
+                        <option value="motorcycle">🏍️ موتوسيكل</option>
+                    </optgroup>
+                    <option value="other">📦 أخرى</option>
+                </select>
+                <select id="filterStatus" class="filter-select">
+                    <option value="all">كل الحالات</option>
+                    <option value="active">✅ سليمة</option>
+                    <option value="maintenance">🔧 تحتاج صيانة</option>
+                </select>
+            </div>
+
+            <!-- قائمة الأجهزة -->
+            <div class="devices-grid" id="devicesGrid" data-aos="fade-up">
+                <!-- الأجهزة هتظهر هنا -->
+            </div>
+
+            <!-- رسالة لو مفيش أجهزة -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📱</div>
+                <h2>لا توجد أجهزة مسجلة</h2>
+                <p>أضف جهازك الأول لتبدأ في متابعة صيانته وتشخيص أعطاله</p>
+                <button class="btn btn-primary" id="btnAddFirstDevice">
+                    <i class="fas fa-plus-circle"></i> إضافة أول جهاز
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== نافذة إضافة/تعديل جهاز ========== -->
+    <div class="modal-overlay" id="deviceModal">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-header">
+                <h3 id="modalTitle">إضافة جهاز جديد</h3>
+            </div>
+            <div class="modal-body">
+                <form id="deviceForm">
+                    <input type="hidden" id="deviceId">
+                    
+                    <div class="form-group">
+                        <label for="deviceType">نوع الجهاز</label>
+                        <select id="deviceType" required>
+                            <option value="">-- اختر نوع الجهاز --</option>
+                            
+                            <optgroup label="🏠 أجهزة منزلية كبيرة">
+                                <option value="fridge">❄️ ثلاجة</option>
+                                <option value="freezer">🧊 ديب فريزر</option>
+                                <option value="washer">🌀 غسالة أتوماتيك</option>
+                                <option value="washer-semi">🔄 غسالة نصف أتوماتيك</option>
+                                <option value="dryer">👕 مجفف ملابس</option>
+                                <option value="dishwasher">🍽️ غسالة أطباق</option>
+                                <option value="ac">🌬️ مكيف هواء</option>
+                                <option value="ac-central">🏢 مكيف مركزي</option>
+                                <option value="water-heater">💧 سخان مياه (كهرباء)</option>
+                                <option value="water-heater-gas">🔥 سخان مياه (غاز)</option>
+                                <option value="water-cooler">🚰 مبرد مياه</option>
+                                <option value="water-pump">💦 مضخة مياه</option>
+                            </optgroup>
+                            
+                            <optgroup label="🍳 أجهزة مطبخ">
+                                <option value="oven">🔥 فرن / بوتاجاز</option>
+                                <option value="microwave">📡 ميكروويف</option>
+                                <option value="cooker-hood">💨 شفاط مطبخ</option>
+                                <option value="blender">🥤 خلاط / كبة</option>
+                                <option value="coffee-maker">☕ ماكينة قهوة</option>
+                                <option value="toaster">🍞 محمصة خبز</option>
+                                <option value="food-processor">🍴 محضر طعام</option>
+                                <option value="juicer">🧃 عصارة</option>
+                                <option value="rice-cooker">🍚 طباخ أرز</option>
+                                <option value="air-fryer">🍗 مقلاة هوائية</option>
+                                <option value="electric-oven">♨️ فرن كهربائي</option>
+                                <option value="kettle">🫖 غلاية مياه</option>
+                            </optgroup>
+                            
+                            <optgroup label="📺 أجهزة إلكترونية وترفيه">
+                                <option value="tv">📺 تلفزيون / شاشة</option>
+                                <option value="receiver">📡 رسيفر</option>
+                                <option value="sound-system">🔊 نظام صوتي / سماعات</option>
+                                <option value="home-theater">🎬 هوم ثياتر</option>
+                                <option value="projector">📽️ بروجيكتور</option>
+                                <option value="camera">📷 كاميرا</option>
+                                <option value="drone">🛸 درون</option>
+                                <option value="gaming-console">🎮 جهاز ألعاب</option>
+                            </optgroup>
+                            
+                            <optgroup label="💻 أجهزة كمبيوتر">
+                                <option value="laptop">💻 لابتوب</option>
+                                <option value="desktop">🖥️ كمبيوتر مكتبي</option>
+                                <option value="tablet">📱 تابلت</option>
+                                <option value="printer">🖨️ طابعة</option>
+                                <option value="scanner">📠 سكانر</option>
+                                <option value="monitor">🖥️ شاشة كمبيوتر</option>
+                                <option value="router">📶 راوتر إنترنت</option>
+                                <option value="nas">🗄️ خادم تخزين NAS</option>
+                            </optgroup>
+                            
+                            <optgroup label="🏠 أجهزة منزلية صغيرة">
+                                <option value="vacuum">🧹 مكنسة كهربائية</option>
+                                <option value="robot-vacuum">🤖 مكنسة روبوت</option>
+                                <option value="iron">👔 مكواة</option>
+                                <option value="steam-iron">💨 مكواة بخار</option>
+                                <option value="fan">🌀 مروحة</option>
+                                <option value="ceiling-fan">🔃 مروحة سقف</option>
+                                <option value="sewing-machine">🧵 ماكينة خياطة</option>
+                                <option value="heater">🔥 دفاية</option>
+                                <option value="air-purifier">🍃 منقي هواء</option>
+                                <option value="humidifier">💧 مرطب هواء</option>
+                            </optgroup>
+                            
+                            <optgroup label="📸 أجهزة تصوير">
+                                <option value="dslr">📸 كاميرا DSLR</option>
+                                <option value="mirrorless">📷 كاميرا ميرورلس</option>
+                                <option value="action-cam">🎬 كاميرا أكشن</option>
+                                <option value="instax">🖼️ كاميرا فورية</option>
+                                <option value="lens">🔍 عدسة</option>
+                                <option value="gimbal">🎥 جيمبال / مثبت</option>
+                                <option value="ring-light">💡 رينج لايت</option>
+                            </optgroup>
+                            
+                            <optgroup label="🚗 مركبات">
+                                <option value="car">🚗 سيارة</option>
+                                <option value="motorcycle">🏍️ موتوسيكل</option>
+                                <option value="scooter">🛵 سكوتر</option>
+                                <option value="truck">🚚 شاحنة / نقل</option>
+                                <option value="bus">🚌 أتوبيس / ميكروباص</option>
+                                <option value="tuk-tuk">🛺 توك توك</option>
+                                <option value="bicycle">🚲 دراجة</option>
+                                <option value="electric-bike">⚡ دراجة كهربائية</option>
+                            </optgroup>
+                            
+                            <optgroup label="🔧 معدات وأدوات">
+                                <option value="generator">⚡ مولد كهرباء</option>
+                                <option value="ups">🔋 بطارية UPS</option>
+                                <option value="welder">💥 ماكينة لحام</option>
+                                <option value="drill">🔩 مثقاب / شنيور</option>
+                                <option value="compressor">💨 كمبروسر هواء</option>
+                                <option value="solar-panel">☀️ لوح طاقة شمسية</option>
+                            </optgroup>
+                            
+                            <optgroup label="📱 أجهزة ذكية">
+                                <option value="smartphone">📱 هاتف ذكي</option>
+                                <option value="smartwatch">⌚ ساعة ذكية</option>
+                                <option value="smart-speaker">🔊 سماعة ذكية</option>
+                                <option value="smart-lock">🔐 قفل ذكي</option>
+                                <option value="smart-light">💡 إضاءة ذكية</option>
+                                <option value="smart-thermostat">🌡️ ثرموستات ذكي</option>
+                            </optgroup>
+                            
+                            <optgroup label="📦 أجهزة أخرى">
+                                <option value="other">📦 جهاز آخر</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deviceBrand">الماركة</label>
+                        <input type="text" id="deviceBrand" placeholder="مثال: إل جي، سامسونج، توشيبا..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deviceModel">الموديل / رقم الطراز</label>
+                        <input type="text" id="deviceModel" placeholder="مثال: LG-S637MCV" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="purchaseDate">تاريخ الشراء</label>
+                            <input type="date" id="purchaseDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="warrantyMonths">مدة الضمان (شهور)</label>
+                            <input type="number" id="warrantyMonths" value="24" min="0" max="120">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deviceNotes">ملاحظات (اختياري)</label>
+                        <textarea id="deviceNotes" rows="3" placeholder="أي ملاحظات إضافية عن الجهاز..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maintenanceInterval">فترة الصيانة الدورية</label>
+                        <select id="maintenanceInterval">
+                            <option value="3">كل 3 شهور</option>
+                            <option value="6" selected>كل 6 شهور</option>
+                            <option value="12">كل سنة</option>
+                            <option value="0">بدون تذكير</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="btnCancel">إلغاء</button>
+                        <button type="submit" class="btn btn-primary">💾 حفظ الجهاز</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== نافذة تأكيد الحذف ========== -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal modal-sm">
+            <button class="modal-close" id="modalCloseDelete">&times;</button>
+            <div class="modal-header">
+                <h3>🗑️ تأكيد الحذف</h3>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف هذا الجهاز؟</p>
+                <p style="color:#64748B;font-size:0.9rem;">سيتم حذف كل بيانات الصيانة المرتبطة به.</p>
+                <div class="form-actions">
+                    <button class="btn btn-outline" id="btnCancelDelete">إلغاء</button>
+                    <button class="btn btn-danger" id="btnConfirmDelete">حذف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/devices.js"></script>
+    <script>
+        AOS.init({ duration: 600, once: true });
+        
+        const user = JSON.parse(localStorage.getItem('shakhesly_current_user'));
+        if (!user) window.location.href = 'index.html';
+        
+        const notifications = JSON.parse(localStorage.getItem('shakhesly_notifications')) || [];
+        const unread = notifications.filter(n => n.userId === user.id && !n.read).length;
+        const badge = document.getElementById('sidebarBadge');
+        if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline'; }
+    </script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(registration) {
+                    console.log('✅ Service Worker مسجل بنجاح');
+                }).catch(function(error) {
+                    console.log('❌ فشل تسجيل Service Worker:', error);
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

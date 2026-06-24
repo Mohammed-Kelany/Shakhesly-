@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الطلبات الواردة - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/incoming-orders.css">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10B981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="شخصلي">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- ========== الشريط الجانبي ========== -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="assets/images/logo.png" alt="شخصلي" style="max-width: 130px; height: auto; display: block; margin-right: 0; margin-left: auto;"> 
+                <!-- <img src="assets/images/logo.png" alt="شخصلي" style="max-width: 130px; height: auto; display: block; margin: 0 auto;"> -->
+            </div>
+            <nav class="sidebar-menu">
+                <a href="dashboard-tech.html"><span><i class="fas fa-home"></i> الرئيسية</span></a>
+                <a href="incoming-orders.html" class="active"><span><i class="fas fa-tasks"></i> الطلبات الواردة</span></a>
+                <a href="ratings.html"><span><i class="fas fa-star"></i> تقييماتي</span></a>
+                <a href="notifications.html"><span><i class="fas fa-bell"></i> الإشعارات</span><span class="notification-badge" id="sidebarBadge">0</span></a>
+                <a href="profile.html"><span><i class="fas fa-cog"></i> الإعدادات</span></a>
+            </nav>
+            <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </aside>
+
+        <!-- ========== المحتوى الرئيسي ========== -->
+        <main class="main-content">
+            
+            <div class="page-header" data-aos="fade-down">
+                <div>
+                    <h1>📥 الطلبات الواردة</h1>
+                    <p>قدم عروض أسعار تنافسية للعملاء</p>
+                </div>
+                <div class="header-badge">
+                    <span class="badge-count" id="newOrdersCount">0</span>
+                    <span>طلبات جديدة</span>
+                </div>
+            </div>
+
+            <div class="stats-grid" data-aos="fade-up">
+                <div class="stat-card">
+                    <div class="stat-icon">📥</div>
+                    <div class="stat-number" id="totalIncoming">0</div>
+                    <div class="stat-label">إجمالي الواردة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" id="pendingIncoming">0</div>
+                    <div class="stat-label">جديدة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-number" id="bidIncoming">0</div>
+                    <div class="stat-label">قدمت عرض</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="acceptedIncoming">0</div>
+                    <div class="stat-label">مقبولة</div>
+                </div>
+            </div>
+
+            <div class="tabs" data-aos="fade-up">
+                <button class="tab active" data-filter="all">الكل</button>
+                <button class="tab" data-filter="pending">⏳ جديدة</button>
+                <button class="tab" data-filter="bidding">💰 قدمت عرض</button>
+                <button class="tab" data-filter="accepted">🎯 تم اختياري</button>
+                <button class="tab" data-filter="completed">✔️ مكتملة</button>
+            </div>
+
+            <div class="search-bar" data-aos="fade-up">
+                <input type="text" id="searchOrder" placeholder="🔍 بحث عن عميل أو جهاز..." class="search-input">
+                <select id="filterDevice" class="filter-select">
+                    <option value="all">كل الأجهزة</option>
+                    <option value="fridge">❄️ ثلاجة</option>
+                    <option value="washer">🌀 غسالة</option>
+                    <option value="tv">📺 تلفزيون</option>
+                    <option value="ac">🌬️ مكيف</option>
+                    <option value="car">🚗 سيارة</option>
+                    <option value="other">📦 أخرى</option>
+                </select>
+            </div>
+
+            <div class="orders-list" id="ordersList" data-aos="fade-up"></div>
+
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">🎉</div>
+                <h2>لا توجد طلبات واردة حالياً</h2>
+                <p>ستظهر هنا طلبات العملاء القريبين من منطقتك</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== نافذة تفاصيل الطلب ========== -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <button class="modal-close" id="modalCloseDetail">&times;</button>
+            <div class="modal-header"><h3 id="detailTitle">تفاصيل الطلب</h3></div>
+            <div class="modal-body" id="detailContent"></div>
+            <div class="modal-actions" id="detailActions"></div>
+        </div>
+    </div>
+
+    <!-- ========== نافذة تقديم عرض السعر ========== -->
+    <div class="modal-overlay" id="priceModal">
+        <div class="modal modal-sm">
+            <button class="modal-close" id="modalClosePrice">&times;</button>
+            <div class="modal-header"><h3>💰 تقديم عرض سعر</h3></div>
+            <div class="modal-body">
+                <p>أدخل السعر التقديري للصيانة بالجنيه المصري</p>
+                <input type="number" id="servicePrice" placeholder="المبلغ بالجنيه المصري" class="price-input" min="50" step="50">
+                <div class="form-actions">
+                    <button class="btn btn-outline" id="btnCancelPrice">إلغاء</button>
+                    <button class="btn btn-accept" id="btnConfirmPrice">تقديم العرض</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/incoming-orders.js"></script>
+    <script>
+        AOS.init({ duration: 600, once: true });
+        const user = JSON.parse(localStorage.getItem('shakhesly_current_user'));
+        if (!user || user.type !== 'tech') window.location.href = 'index.html';
+        const notifications = JSON.parse(localStorage.getItem('shakhesly_notifications')) || [];
+        const unread = notifications.filter(n => n.userId === user.id && !n.read).length;
+        const badge = document.getElementById('sidebarBadge');
+        if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline'; }
+    </script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإشعارات - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/notifications.css">
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="شخصلي">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
+
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="main-content">
+            <div class="page-header"><div><h1>🔔 الإشعارات</h1><p>جميع التحديثات والتنبيهات</p></div><div class="header-actions"><button class="btn btn-outline btn-sm" id="btnMarkAllRead"><i class="fas fa-check-double"></i> تحديد الكل كمقروء</button><button class="btn btn-outline btn-sm" id="btnClearAll"><i class="fas fa-trash"></i> حذف الكل</button></div></div>
+            <div class="tabs"><button class="tab active" data-filter="all">الكل</button><button class="tab" data-filter="unread">🔵 غير مقروء <span class="tab-badge" id="unreadCount">0</span></button><button class="tab" data-filter="order">📋 طلبات</button><button class="tab" data-filter="maintenance">🔧 صيانة</button><button class="tab" data-filter="system">⚙️ نظام</button></div>
+            <div class="notifications-list" id="notificationsList"></div>
+            <div class="empty-state" id="emptyState"><div class="empty-icon">🔔</div><h2>لا توجد إشعارات</h2><p>ستظهر هنا جميع الإشعارات المهمة</p></div>
+        </main>
+    </div>
+    <script src="js/notifications.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script> 
+<!-- تسجيل Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('✅ Service Worker مسجل بنجاح');
+            }).catch(function(error) {
+                console.log('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
+    }
+</script> 
+
+
+</body>
+</html> 

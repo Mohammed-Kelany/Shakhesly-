@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تشخيص العطل - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/diagnose.css">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="شخصلي">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/images/logo.png" alt="شخصلي" class="logo-img">
+            </a>
+            <nav class="nav">
+                <a href="index.html">الرئيسية</a>
+                <a href="diagnose.html" class="active">تشخيص عطل</a>
+                <a href="dashboard-user.html">لوحة التحكم</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="diagnose-page">
+        <div class="container">
+            <div class="page-header" data-aos="fade-down">
+                <h1>🔍 تشخيص عطل جهازك</h1>
+                <p>أخبرنا عن المشكلة وسيقوم الذكاء الاصطناعي بتحليلها فوراً</p>
+            </div>
+
+            <div class="diagnose-grid">
+                <div class="input-section" data-aos="fade-left">
+                    
+                    <!-- إعدادات API (اختياري) -->
+                    <div class="card" style="background:#FFF7ED;border:1px solid #FED7AA;">
+                        <details>
+                            <summary style="cursor:pointer;font-weight:700;color:#F59E0B;">⚡ تفعيل الذكاء الاصطناعي (اختياري)</summary>
+                            <div style="margin-top:10px;">
+                                <label for="apiKeyInput" style="font-size:0.85rem;color:#64748B;">مفتاح OpenAI API</label>
+                                <input type="password" id="apiKeyInput" placeholder="sk-..." style="width:100%;padding:10px;border:1px solid #FED7AA;border-radius:8px;font-family:monospace;font-size:0.85rem;margin-top:5px;">
+                                <p style="font-size:0.75rem;color:#94A3B8;margin-top:5px;">للتجربة فقط. اتركه فارغاً لاستخدام التشخيص المحلي.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="card">
+                        <h3>📱 اختر الجهاز</h3>
+                        <select id="deviceSelect" class="form-select">
+                            <option value="">-- اختر نوع الجهاز --</option>
+                            <optgroup label="🏠 أجهزة منزلية كبيرة">
+                                <option value="fridge">❄️ ثلاجة</option>
+                                <option value="freezer">🧊 ديب فريزر</option>
+                                <option value="washer">🌀 غسالة أتوماتيك</option>
+                                <option value="dryer">👕 مجفف ملابس</option>
+                                <option value="dishwasher">🍽️ غسالة أطباق</option>
+                                <option value="ac">🌬️ مكيف هواء</option>
+                                <option value="water-heater">💧 سخان مياه</option>
+                            </optgroup>
+                            <optgroup label="🍳 أجهزة مطبخ">
+                                <option value="oven">🔥 فرن / بوتاجاز</option>
+                                <option value="microwave">📡 ميكروويف</option>
+                                <option value="blender">🥤 خلاط / كبة</option>
+                                <option value="coffee-maker">☕ ماكينة قهوة</option>
+                            </optgroup>
+                            <optgroup label="📺 إلكترونيات">
+                                <option value="tv">📺 تلفزيون / شاشة</option>
+                                <option value="laptop">💻 لابتوب</option>
+                                <option value="desktop">🖥️ كمبيوتر مكتبي</option>
+                                <option value="printer">🖨️ طابعة</option>
+                            </optgroup>
+                            <optgroup label="🚗 مركبات">
+                                <option value="car">🚗 سيارة</option>
+                                <option value="motorcycle">🏍️ موتوسيكل</option>
+                                <option value="scooter">🛵 سكوتر</option>
+                            </optgroup>
+                            <optgroup label="📱 أجهزة ذكية">
+                                <option value="smartphone">📱 هاتف ذكي</option>
+                                <option value="smartwatch">⌚ ساعة ذكية</option>
+                            </optgroup>
+                            <option value="other">📦 جهاز آخر</option>
+                        </select>
+                    </div>
+
+                    <div class="card">
+                        <h3>✏️ وصف المشكلة</h3>
+                        <textarea id="problemDesc" class="form-textarea" placeholder="مثال: الجهاز لا يعمل، يصدر صوتاً غريباً..."></textarea>
+                        <div class="input-actions">
+                            <button class="btn btn-outline btn-sm" id="btnVoice"><i class="fas fa-microphone"></i> صوتي</button>
+                            <button class="btn btn-outline btn-sm" id="btnCamera"><i class="fas fa-camera"></i> صورة</button>
+                            <input type="file" id="imageInput" accept="image/*" hidden>
+                        </div>
+                        <button class="btn btn-primary btn-block btn-diagnose" id="btnDiagnose"><i class="fas fa-stethoscope"></i> شخّص الآن</button>
+                    </div>
+                </div>
+
+                <div class="result-section" data-aos="fade-right">
+                    <div class="result-empty" id="resultEmpty">
+                        <div style="font-size:6rem;">🤖</div>
+                        <h3>في انتظار وصف المشكلة</h3>
+                        <p>اكتب وصف المشكلة واضغط "شخّص الآن"</p>
+                    </div>
+                    <div class="result-content" id="resultContent" style="display:none;">
+                        <div class="card">
+                            <span class="badge badge-danger">نسبة التطابق 95%</span>
+                            <h3>🛠️ العطل المتوقع</h3>
+                            <div class="diagnosis-box"><p id="diagnosisText"></p></div>
+                        </div>
+                        <div class="card">
+                            <h3>📦 قطع الغيار (بالجنيه المصري)</h3>
+                            <div class="parts-list" id="partsList"></div>
+                        </div>
+                        <div class="card">
+                            <h3>📺 فيديوهات تعليمية</h3>
+                            <div class="videos-grid" id="videosGrid"></div>
+                        </div>
+                        <div class="card">
+                            <h3>👨‍🔧 فنيون معتمدون</h3>
+                            <div class="tech-list" id="techList"></div>
+                        </div>
+                        <div id="requestSection"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+        <div class="loading-spinner">
+            <div style="font-size:4rem;">⏳</div>
+            <p>جاري تحليل المشكلة...</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/diagnose.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html> 
