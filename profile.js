@@ -1,325 +1,254 @@
-/* ============================================
-   شخصلي AI - تفاعلات صفحة الملف الشخصي
-   ============================================ */
-   const SECRET_KEY = 'ShakheslyAI2024SecretKey!@';
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - شخصلي AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/profile.css">
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="شخصلي">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
 
-function encryptPassword(password) {
-    return CryptoJS.AES.encrypt(password, SECRET_KEY).toString();
-}
+</head>
+<body>
 
-function decryptPassword(encryptedPassword) {
-    const bytes = CryptoJS.AES.decrypt(encryptedPassword, SECRET_KEY);
-    return bytes.toString(CryptoJS.enc.Utf8);
-} 
+    <div class="dashboard">
+        <!-- ========== الشريط الجانبي ========== -->
+        <aside class="sidebar">
+            <img src="assets/images/logo.png" class="logo-img">
+            <!-- المحتوى هيتضاف حسب نوع المستخدم -->
+        </aside>
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // التحقق من تسجيل الدخول
-    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    if (!currentUser) {
-        window.location.href = 'index.html';
-        return;
-    }
+        <!-- ========== المحتوى الرئيسي ========== -->
+        <main class="main-content">
+            
+            <!-- رأس الصفحة -->
+            <div class="page-header">
+                <h1>👤 الملف الشخصي</h1>
+                <p>تعديل بيانات حسابك وإعداداتك</p>
+            </div>
 
-    // ========== بناء الشريط الجانبي ==========
-    buildSidebar(currentUser);
+            <!-- تبويبات -->
+            <div class="tabs">
+                <button class="tab active" data-tab="info">📋 المعلومات الشخصية</button>
+                <button class="tab" data-tab="password">🔒 تغيير كلمة المرور</button>
+                <button class="tab" data-tab="settings">⚙️ الإعدادات</button>
+            </div>
 
-    // ========== تحميل بيانات المستخدم ==========
-    loadUserData(currentUser);
+            <!-- ========== تبويب المعلومات الشخصية ========== -->
+            <div class="tab-content active" id="tab-info">
+                <div class="card">
+                    <div class="avatar-section">
+                        <div class="avatar" id="userAvatar">
+                            <span id="avatarInitial">U</span>
+                        </div>
+                        <div>
+                            <h2 id="displayName">اسم المستخدم</h2>
+                            <p id="displayEmail">email@example.com</p>
+                        </div>
+                    </div>
 
-    // ========== تبويبات ==========
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            const target = this.getAttribute('data-tab');
-            document.getElementById(`tab-${target}`).classList.add('active');
-        });
-    });
+                    <form id="infoForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName">الاسم الكامل</label>
+                                <input type="text" id="fullName" placeholder="أدخل اسمك الكامل" required>
+                            </div>
+                        </div>
 
-    // ========== حفظ المعلومات الشخصية ==========
-    document.getElementById('infoForm').addEventListener('submit', savePersonalInfo);
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">البريد الإلكتروني</label>
+                                <input type="email" id="email" placeholder="example@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">رقم الهاتف</label>
+                                <input type="tel" id="phone" placeholder="+20 1xx xxxxxxx" required>
+                            </div>
+                        </div>
 
-    // ========== تغيير كلمة المرور ==========
-    document.getElementById('passwordForm').addEventListener('submit', changePassword);
-    document.getElementById('newPassword').addEventListener('input', checkPasswordStrength);
+                        <!-- حقول خاصة بالفني -->
+                        <div id="techFields" style="display:none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="specialization">التخصص</label>
+                                    <select id="specialization">
+                                        <option value="">-- اختر التخصص --</option>
+                                        <option value="fridge">❄️ تبريد وتكييف</option>
+                                        <option value="washer">🌀 غسالات</option>
+                                        <option value="tv">📺 تلفزيونات وشاشات</option>
+                                        <option value="all">🔧 صيانة شاملة</option>
+                                        <option value="other">📦 أخرى</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="experience">سنوات الخبرة</label>
+                                    <input type="number" id="experience" placeholder="مثال: 5" min="0" max="50">
+                                </div>
+                            </div>
 
-    // ========== حفظ الإعدادات ==========
-    document.getElementById('btnSaveSettings').addEventListener('click', saveSettings);
+                            <div class="form-group">
+                                <label for="location">منطقة الخدمة</label>
+                                <input type="text" id="location" placeholder="مثال: القاهرة - مدينة نصر">
+                            </div>
 
-    // ========== حذف الحساب ==========
-    document.getElementById('btnDeleteAccount').addEventListener('click', openDeleteModal);
-    document.getElementById('modalCloseDelete').addEventListener('click', closeDeleteModal);
-    document.getElementById('btnCancelDelete').addEventListener('click', closeDeleteModal);
-    document.getElementById('btnConfirmDelete').addEventListener('click', deleteAccount);
-    document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
-        if (e.target === this) closeDeleteModal();
-    });
-});
+                            <div class="form-group">
+                                <label for="about">نبذة عنك</label>
+                                <textarea id="about" rows="4" placeholder="اكتب نبذة عن خبراتك وخدماتك..."></textarea>
+                            </div>
+                        </div>
 
-/* ==============================
-   بناء الشريط الجانبي
-   ============================== */
-function buildSidebar(user) {
-    const sidebar = document.getElementById('sidebar');
-    
-    if (user.type === 'tech') {
-        sidebar.innerHTML = `
-            <div class="sidebar-logo">🔧 شخصلي</div>
-            <nav class="sidebar-menu">
-                <a href="dashboard-tech.html"><i class="fas fa-home"></i> الرئيسية</a>
-                <a href="incoming-orders.html"><i class="fas fa-tasks"></i> الطلبات الواردة</a>
-                <a href="#"><i class="fas fa-check-circle"></i> المكتملة</a>
-                <a href="#"><i class="fas fa-star"></i> تقييماتي</a>
-                <a href="profile.html" class="active"><i class="fas fa-user-cog"></i> الملف الشخصي</a>
-            </nav>
-            <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
-        `;
-    } else {
-        sidebar.innerHTML = `
-            <div class="sidebar-logo">🤖 شخصلي</div>
-            <nav class="sidebar-menu">
-                <a href="dashboard-user.html"><i class="fas fa-home"></i> الرئيسية</a>
-                <a href="diagnose.html"><i class="fas fa-stethoscope"></i> تشخيص عطل</a>
-                <a href="devices.html"><i class="fas fa-mobile-alt"></i> أجهزتي</a>
-                <a href="orders.html"><i class="fas fa-history"></i> طلباتي</a>
-                <a href="profile.html" class="active"><i class="fas fa-user"></i> الملف الشخصي</a>
-            </nav>
-            <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
-        `;
-    }
-}
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> حفظ التغييرات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-/* ==============================
-   تحميل بيانات المستخدم
-   ============================== */
-function loadUserData(user) {
-    // عرض الاسم والبريد
-    document.getElementById('displayName').textContent = user.fullName || 'المستخدم';
-    document.getElementById('displayEmail').textContent = user.email || '';
-    document.getElementById('avatarInitial').textContent = (user.fullName || 'U')[0].toUpperCase();
-    document.getElementById('userAvatar').style.background = user.type === 'tech' ? 
-        'linear-gradient(135deg, #10B981, #059669)' : 
-        'linear-gradient(135deg, #2563EB, #1E3A8A)';
+            <!-- ========== تبويب تغيير كلمة المرور ========== -->
+            <div class="tab-content" id="tab-password">
+                <div class="card">
+                    <h3>🔒 تغيير كلمة المرور</h3>
+                    <p style="color:var(--gray-500);margin-bottom:25px;">أدخل كلمة المرور الحالية ثم كلمة المرور الجديدة</p>
 
-    // تعبئة النموذج
-    document.getElementById('fullName').value = user.fullName || '';
-    document.getElementById('email').value = user.email || '';
-    document.getElementById('phone').value = user.phone || '';
+                    <form id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">كلمة المرور الحالية</label>
+                            <input type="password" id="currentPassword" placeholder="أدخل كلمة المرور الحالية" required>
+                        </div>
 
-    // حقول الفني
-    if (user.type === 'tech') {
-        document.getElementById('techFields').style.display = 'block';
-        document.getElementById('specialization').value = user.specialization || '';
-        document.getElementById('experience').value = user.experience || '';
-        document.getElementById('location').value = user.location || '';
-        document.getElementById('about').value = user.about || '';
-    }
+                        <div class="form-group">
+                            <label for="newPassword">كلمة المرور الجديدة</label>
+                            <input type="password" id="newPassword" placeholder="أدخل كلمة المرور الجديدة" required minlength="6">
+                        </div>
 
-    // تحميل الإعدادات
-    const settings = JSON.parse(localStorage.getItem('shakhesly_settings')) || {};
-    document.getElementById('notificationsEnabled').checked = settings.notifications !== false;
-    document.getElementById('emailNotifications').checked = settings.emailNotifications === true;
-    document.getElementById('maintenanceReminders').checked = settings.maintenanceReminders !== false;
-}
+                        <div class="form-group">
+                            <label for="confirmPassword">تأكيد كلمة المرور الجديدة</label>
+                            <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور الجديدة" required minlength="6">
+                        </div>
 
-/* ==============================
-   حفظ المعلومات الشخصية
-   ============================== */
-function savePersonalInfo(e) {
-    e.preventDefault();
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                            <span id="strengthText">قوة كلمة المرور</span>
+                        </div>
 
-    const fullName = document.getElementById('fullName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> تغيير كلمة المرور
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-    if (!fullName || !email || !phone) {
-        showNotification('الرجاء إدخال جميع البيانات المطلوبة', 'error');
-        return;
-    }
+            <!-- ========== تبويب الإعدادات ========== -->
+            <div class="tab-content" id="tab-settings">
+                <div class="card">
+                    <h3>⚙️ إعدادات الحساب</h3>
 
-    if (!email.includes('@') || !email.includes('.')) {
-        showNotification('الرجاء إدخال بريد إلكتروني صحيح', 'error');
-        return;
-    }
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <strong>🔔 الإشعارات</strong>
+                            <p>تفعيل إشعارات طلبات الصيانة والتذكيرات</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notificationsEnabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-    // تحديث بيانات الجلسة
-    let currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    currentUser.fullName = fullName;
-    currentUser.email = email;
-    currentUser.phone = phone;
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <strong>📧 إشعارات البريد الإلكتروني</strong>
+                            <p>استقبال تحديثات الطلبات عبر البريد الإلكتروني</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailNotifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-    if (currentUser.type === 'tech') {
-        currentUser.specialization = document.getElementById('specialization').value;
-        currentUser.experience = document.getElementById('experience').value;
-        currentUser.location = document.getElementById('location').value;
-        currentUser.about = document.getElementById('about').value.trim();
-    }
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <strong>📱 إشعارات الصيانة الدورية</strong>
+                            <p>تذكير بمواعيد الصيانة الدورية للأجهزة</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenanceReminders" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
 
-    localStorage.setItem('shakhesly_current_user', JSON.stringify(currentUser));
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="btnSaveSettings">
+                            <i class="fas fa-save"></i> حفظ الإعدادات
+                        </button>
+                    </div>
+                </div>
 
-    // تحديث في قائمة المستخدمين
-    let users = JSON.parse(localStorage.getItem('shakhesly_users')) || [];
-    users = users.map(u => {
-        if (u.id === currentUser.id || u.email === currentUser.email) {
-            return { ...u, ...currentUser, password: u.password };
-        }
-        return u;
-    });
-    localStorage.setItem('shakhesly_users', JSON.stringify(users));
+                <!-- حذف الحساب -->
+                <div class="card danger-card">
+                    <h3>🗑️ منطقة الخطر</h3>
+                    <p style="color:var(--gray-500);margin-bottom:20px;">حذف حسابك نهائياً. لا يمكن التراجع عن هذا الإجراء.</p>
+                    <button class="btn btn-danger" id="btnDeleteAccount">
+                        <i class="fas fa-trash"></i> حذف الحساب
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
 
-    // تحديث العرض
-    document.getElementById('displayName').textContent = fullName;
-    document.getElementById('displayEmail').textContent = email;
-    document.getElementById('avatarInitial').textContent = fullName[0].toUpperCase();
+    <!-- ========== نافذة تأكيد حذف الحساب ========== -->
+    <div class="modal-overlay" id="deleteAccountModal">
+        <div class="modal modal-sm">
+            <button class="modal-close" id="modalCloseDelete">&times;</button>
+            <div class="modal-header">
+                <h3>⚠️ تأكيد حذف الحساب</h3>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد تماماً من حذف حسابك؟</p>
+                <p style="color:#EF4444;font-weight:700;">سيتم حذف جميع بياناتك نهائياً:</p>
+                <ul style="color:var(--gray-600);margin:15px 20px;line-height:2;">
+                    <li>❌ جميع أجهزتك المسجلة</li>
+                    <li>❌ جميع طلبات الصيانة</li>
+                    <li>❌ جميع التقييمات</li>
+                </ul>
+                <p style="color:#EF4444;font-weight:700;">لا يمكن التراجع عن هذا الإجراء!</p>
+                <div class="form-actions">
+                    <button class="btn btn-outline" id="btnCancelDelete">إلغاء</button>
+                    <button class="btn btn-danger" id="btnConfirmDelete">نعم، احذف حسابي</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    showNotification('تم حفظ التغييرات بنجاح ✅', 'success');
-}
+    <script src="js/profile.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({duration:600,once:true});</script> 
+<!-- تسجيل Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('✅ Service Worker مسجل بنجاح');
+            }).catch(function(error) {
+                console.log('❌ فشل تسجيل Service Worker:', error);
+            });
+        });
+    }
+</script> 
+<!-- CryptoJS للتشفير -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script> 
 
-/* ==============================
-   تغيير كلمة المرور
-   ============================== */
-function changePassword(e) {
-    e.preventDefault();
 
-    const currentPassword = document.getElementById('currentPassword').value;
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-
-    if (newPassword.length < 6) {
-        showNotification('كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل', 'error');
-        return;
-    }
-
-    if (newPassword !== confirmPassword) {
-        showNotification('كلمة المرور الجديدة غير متطابقة', 'error');
-        return;
-    }
-
-    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    let users = JSON.parse(localStorage.getItem('shakhesly_users')) || [];
-    
-    const userInDB = users.find(u => u.email === currentUser.email);
-    
-    if (userInDB && userInDB.password !== currentPassword) {
-        showNotification('كلمة المرور الحالية غير صحيحة', 'error');
-        return;
-    }
-
-    // تحديث كلمة المرور
-    users = users.map(u => {
-        if (u.email === currentUser.email) {
-            u.password = newPassword;
-        }
-        return u;
-    });
-    localStorage.setItem('shakhesly_users', JSON.stringify(users));
-
-    document.getElementById('passwordForm').reset();
-    document.getElementById('strengthBar').style.width = '0';
-    document.getElementById('strengthText').textContent = 'قوة كلمة المرور';
-
-    showNotification('تم تغيير كلمة المرور بنجاح 🔒', 'success');
-}
-
-/* ==============================
-   قوة كلمة المرور
-   ============================== */
-function checkPasswordStrength() {
-    const password = document.getElementById('newPassword').value;
-    const bar = document.getElementById('strengthBar');
-    const text = document.getElementById('strengthText');
-    
-    let strength = 0;
-    if (password.length >= 6) strength++;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-    const colors = ['#EF4444', '#F59E0B', '#F59E0B', '#10B981', '#10B981'];
-    const texts = ['ضعيفة جداً', 'ضعيفة', 'متوسطة', 'قوية', 'قوية جداً'];
-    
-    bar.style.width = (strength * 20) + '%';
-    bar.style.background = colors[strength];
-    text.textContent = texts[strength];
-}
-
-/* ==============================
-   حفظ الإعدادات
-   ============================== */
-function saveSettings() {
-    const settings = {
-        notifications: document.getElementById('notificationsEnabled').checked,
-        emailNotifications: document.getElementById('emailNotifications').checked,
-        maintenanceReminders: document.getElementById('maintenanceReminders').checked
-    };
-    
-    localStorage.setItem('shakhesly_settings', JSON.stringify(settings));
-    showNotification('تم حفظ الإعدادات ⚙️', 'success');
-}
-
-/* ==============================
-   حذف الحساب
-   ============================== */
-function openDeleteModal() {
-    document.getElementById('deleteAccountModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteAccountModal').classList.remove('active');
-    document.body.style.overflow = '';
-}
-
-function deleteAccount() {
-    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-
-    // حذف من قائمة المستخدمين
-    let users = JSON.parse(localStorage.getItem('shakhesly_users')) || [];
-    users = users.filter(u => u.email !== currentUser.email);
-    localStorage.setItem('shakhesly_users', JSON.stringify(users));
-
-    // حذف الأجهزة
-    let devices = JSON.parse(localStorage.getItem('shakhesly_devices')) || [];
-    devices = devices.filter(d => d.userId !== currentUser.id);
-    localStorage.setItem('shakhesly_devices', JSON.stringify(devices));
-
-    // حذف الطلبات
-    let orders = JSON.parse(localStorage.getItem('shakhesly_orders')) || [];
-    orders = orders.filter(o => o.userId !== currentUser.id && o.techId !== currentUser.id);
-    localStorage.setItem('shakhesly_orders', JSON.stringify(orders));
-
-    // حذف الجلسة
-    localStorage.removeItem('shakhesly_current_user');
-    localStorage.removeItem('shakhesly_settings');
-
-    window.location.href = 'index.html';
-}
-
-/* ==============================
-   تسجيل الخروج
-   ============================== */
-function logout() {
-    localStorage.removeItem('shakhesly_current_user');
-    window.location.href = 'index.html';
-}
-
-/* ==============================
-   إشعارات
-   ============================== */
-function showNotification(message, type) {
-    document.querySelectorAll('.notification').forEach(n => n.remove());
-    const bg = type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#2563EB';
-    const n = document.createElement('div');
-    n.textContent = message;
-    Object.assign(n.style, {
-        position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)',
-        background: bg, color: 'white', padding: '14px 24px', borderRadius: '50px',
-        zIndex: '9999', fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-    });
-    document.body.appendChild(n);
-    setTimeout(() => { n.style.opacity = '0'; n.style.transition = '0.3s'; setTimeout(() => n.remove(), 300); }, 3000);
-} 
-
+</body>
+</html> 
