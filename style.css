@@ -451,7 +451,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 
 /* كرت الكتابة */
 .method-card:nth-child(1)::before {
-    background-image: url(bg-keyboard.png);
+    background-image: url(./bg-keyboard.png);
 }
 
 /* كرت الصوت */
@@ -461,7 +461,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 
 /* كرت الكاميرا */
 .method-card:nth-child(3)::before {
-    background-image: url('../bg-camera.png');
+    background-image: url('./bg-camera.png');
 }
 
 .method-card:hover::before {
