@@ -456,7 +456,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 
 /* كرت الصوت */
 .method-card:nth-child(2)::before {
-    background-image: url('../bg-microphone.png');
+    background-image: url('./bg-microphone.png');
 }
 
 /* كرت الكاميرا */
