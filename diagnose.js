@@ -1,87 +1,218 @@
 /* ============================================
    شخصلي AI - تفاعلات صفحة تشخيص الأعطال
-   الإصدار: 5.0 (OpenAI + صوت + محلي)
+   الإصدار: 5.3 (الكاميرا تعمل بشكل صحيح)
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    AOS.init({ duration: 800, once: true, offset: 50 });
+    if (typeof AOS !== 'undefined') {
+        AOS.init({ duration: 800, once: true, offset: 50 });
+    }
 
     const btnDiagnose = document.getElementById('btnDiagnose');
     const btnVoice = document.getElementById('btnVoice');
     const btnCamera = document.getElementById('btnCamera');
     const imageInput = document.getElementById('imageInput');
+    const cameraInput = document.getElementById('cameraInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const btnRemoveImage = document.getElementById('btnRemoveImage');
 
-    btnDiagnose.addEventListener('click', function() {
-        const device = document.getElementById('deviceSelect').value;
-        const problem = document.getElementById('problemDesc').value.trim();
-        
-        if (!device) return alert('⚠️ الرجاء اختيار الجهاز');
-        if (problem.length < 5) return alert('⚠️ الرجاء كتابة وصف المشكلة (5 أحرف على الأقل)');
-        
-        startDiagnosis(device, problem);
-    });
+    // ========== زر التشخيص الرئيسي ==========
+    if (btnDiagnose) {
+        btnDiagnose.addEventListener('click', function() {
+            const device = document.getElementById('deviceSelect').value;
+            const problem = document.getElementById('problemDesc').value.trim();
+            
+            if (!device) return alert('⚠️ الرجاء اختيار الجهاز');
+            if (problem.length < 5) return alert('⚠️ الرجاء كتابة وصف المشكلة (5 أحرف على الأقل)');
+            
+            startDiagnosis(device, problem);
+        });
+    }
 
-    btnVoice.addEventListener('click', function() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return alert('⚠️ المتصفح لا يدعم التسجيل الصوتي');
+    // ========== زر التسجيل الصوتي ==========
+    if (btnVoice) {
+        btnVoice.addEventListener('click', function() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return alert('⚠️ المتصفح لا يدعم التسجيل الصوتي');
+            
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA';
+            btnVoice.innerHTML = '<i class="fas fa-microphone"></i> جاري الاستماع...';
+            btnVoice.style.background = '#EF4444';
+            btnVoice.style.color = 'white';
+            
+            recognition.onresult = function(e) { document.getElementById('problemDesc').value = e.results[0][0].transcript; };
+            recognition.onerror = function() { alert('⚠️ لم نتمكن من سماعك'); };
+            recognition.onend = function() { 
+                btnVoice.innerHTML = '<i class="fas fa-microphone"></i> صوتي'; 
+                btnVoice.style.background = ''; 
+                btnVoice.style.color = ''; 
+            };
+            recognition.start();
+        });
+    }
+
+    // ========== 🆕 زر الكاميرا (نسخة محسنة) ==========
+    if (btnCamera) {
+        btnCamera.addEventListener('click', function() {
+            showImageSourceOptions();
+        });
+    }
+
+    function showImageSourceOptions() {
+        // إزالة أي نافذة سابقة
+        const oldOverlay = document.getElementById('cameraOptionsOverlay');
+        if (oldOverlay) oldOverlay.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'cameraOptionsOverlay';
+        overlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+        `;
         
-        const recognition = new SpeechRecognition();
-        recognition.lang = 'ar-SA';
-        btnVoice.innerHTML = '<i class="fas fa-microphone"></i> جاري الاستماع...';
-        btnVoice.style.background = '#EF4444';
-        btnVoice.style.color = 'white';
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background: white; border-radius: 20px; padding: 30px;
+            width: 90%; max-width: 400px; text-align: center;
+            position: relative; direction: rtl; font-family: 'Cairo', sans-serif;
+        `;
+        modal.innerHTML = `
+            <button id="closeImageOptions" style="position:absolute;top:10px;left:10px;background:#f1f5f9;border:none;width:36px;height:36px;border-radius:50%;font-size:1.5rem;cursor:pointer;">&times;</button>
+            <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:10px;">📷 اختر مصدر الصورة</h3>
+            <p style="color:#64748B;margin-bottom:20px;">كيف تريد إضافة صورة الجهاز؟</p>
+            <button id="btnOpenCamera" style="width:100%;padding:14px;background:#2563EB;color:white;border:none;border-radius:50px;font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:12px;">
+                📸 فتح الكاميرا
+            </button>
+            <button id="btnOpenGallery" style="width:100%;padding:14px;background:transparent;color:#2563EB;border:2px solid #2563EB;border-radius:50px;font-weight:700;font-size:1rem;cursor:pointer;">
+                🖼️ اختيار من المعرض
+            </button>
+        `;
         
-        recognition.onresult = function(e) { document.getElementById('problemDesc').value = e.results[0][0].transcript; };
-        recognition.onerror = function() { alert('⚠️ لم نتمكن من سماعك'); };
-        recognition.onend = function() { 
-            btnVoice.innerHTML = '<i class="fas fa-microphone"></i> صوتي'; 
-            btnVoice.style.background = ''; 
-            btnVoice.style.color = ''; 
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
+        
+        // زر فتح الكاميرا
+        document.getElementById('btnOpenCamera').addEventListener('click', function() {
+            closeImageModal(overlay);
+            // تعيين capture للكاميرا الخلفية لفتح الكاميرا مباشرة
+            if (cameraInput) {
+                cameraInput.setAttribute('capture', 'environment');
+                cameraInput.click();
+            }
+        });
+        
+        // زر فتح المعرض
+        document.getElementById('btnOpenGallery').addEventListener('click', function() {
+            closeImageModal(overlay);
+            // فتح المعرض
+            if (imageInput) {
+                imageInput.click();
+            }
+        });
+        
+        // زر الإغلاق
+        document.getElementById('closeImageOptions').addEventListener('click', function() {
+            closeImageModal(overlay);
+        });
+        
+        // إغلاق عند الضغط خارج النافذة
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                closeImageModal(overlay);
+            }
+        });
+    }
+    
+    function closeImageModal(overlay) {
+        if (overlay && document.body.contains(overlay)) {
+            document.body.removeChild(overlay);
+        }
+        document.body.style.overflow = '';
+    }
+
+    // معالجة اختيار صورة من المعرض
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                displayImagePreview(e.target.files[0]);
+            }
+        });
+    }
+
+    // معالجة التقاط صورة من الكاميرا
+    if (cameraInput) {
+        cameraInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                displayImagePreview(e.target.files[0]);
+            }
+        });
+    }
+
+    // دالة عرض معاينة الصورة
+    function displayImagePreview(file) {
+        if (!imagePreview || !imagePreviewContainer) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreviewContainer.style.display = 'block';
         };
-        recognition.start();
-    });
+        reader.readAsDataURL(file);
+    }
 
-    btnCamera.addEventListener('click', () => imageInput.click());
-    imageInput.addEventListener('change', e => { if (e.target.files[0]) alert('📷 تم رفع الصورة: ' + e.target.files[0].name); });
+    // زر إزالة الصورة
+    if (btnRemoveImage) {
+        btnRemoveImage.addEventListener('click', function() {
+            if (imagePreview) imagePreview.src = '';
+            if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
+            if (imageInput) imageInput.value = '';
+            if (cameraInput) cameraInput.value = '';
+        });
+    }
+    
+    console.log('✅ نظام التشخيص والكاميرا جاهز');
 });
 
 // ========== دالة بدء التشخيص ==========
 function startDiagnosis(device, problem) {
     const loadingOverlay = document.getElementById('loadingOverlay');
-    loadingOverlay.style.display = 'flex';
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
-    // قراءة مفتاح API من الحقل السري (إن وجد)
     const apiKey = document.getElementById('apiKeyInput')?.value.trim();
 
     if (apiKey) {
         getAIDiagnosis(device, problem, apiKey)
             .then(aiResult => {
-                loadingOverlay.style.display = 'none';
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
                 if (aiResult) {
                     displayResult(aiResult);
                 } else {
-                    const localData = data[device] || data['other'];
-                    displayResult(localData);
+                    const localData = (typeof data !== 'undefined' && data[device]) ? data[device] : (typeof data !== 'undefined' ? data['other'] : null);
+                    if (localData) displayResult(localData);
                 }
             })
             .catch(() => {
-                loadingOverlay.style.display = 'none';
-                const localData = data[device] || data['other'];
-                displayResult(localData);
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                const localData = (typeof data !== 'undefined' && data[device]) ? data[device] : (typeof data !== 'undefined' ? data['other'] : null);
+                if (localData) displayResult(localData);
             });
     } else {
         setTimeout(() => {
-            loadingOverlay.style.display = 'none';
-            const localData = data[device] || data['other'];
-            displayResult(localData);
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+            const localData = (typeof data !== 'undefined' && data[device]) ? data[device] : (typeof data !== 'undefined' ? data['other'] : null);
+            if (localData) displayResult(localData);
         }, 2000);
     }
 }
 
 // ========== دالة التواصل مع OpenAI ==========
 async function getAIDiagnosis(device, problem, apiKey) {
-    const deviceName = document.getElementById('deviceSelect').selectedOptions[0].text;
+    const deviceSelect = document.getElementById('deviceSelect');
+    const deviceName = deviceSelect ? deviceSelect.selectedOptions[0].text : 'الجهاز';
     
     const prompt = `أنت فني صيانة خبير. مستخدم يبلغ عن مشكلة: "${problem}" في جهاز: "${deviceName}". قم بتحليل المشكلة وأعطني النتيجة بتنسيق JSON فقط:
     {
@@ -105,11 +236,13 @@ async function getAIDiagnosis(device, problem, apiKey) {
             })
         });
 
-        const data = await response.json();
-        const content = data.choices[0].message.content;
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
+        const responseData = await response.json();
+        if (responseData.choices && responseData.choices[0]) {
+            const content = responseData.choices[0].message.content;
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
         }
         return null;
     } catch (error) {
@@ -120,46 +253,64 @@ async function getAIDiagnosis(device, problem, apiKey) {
 
 // ========== دالة عرض النتيجة ==========
 function displayResult(result) {
-    document.getElementById('resultEmpty').style.display = 'none';
-    document.getElementById('resultContent').style.display = 'block';
+    const resultEmpty = document.getElementById('resultEmpty');
+    const resultContent = document.getElementById('resultContent');
+    if (resultEmpty) resultEmpty.style.display = 'none';
+    if (resultContent) resultContent.style.display = 'block';
 
-    document.getElementById('diagnosisText').textContent = result.diagnosis || 'لم يتم تحديد التشخيص';
+    const diagnosisText = document.getElementById('diagnosisText');
+    if (diagnosisText) diagnosisText.textContent = result.diagnosis || 'لم يتم تحديد التشخيص';
     
     const partsList = document.getElementById('partsList');
-    if (result.parts && result.parts.length > 0) {
-        partsList.innerHTML = result.parts.map(p => 
-            `<div class="part-item"><span>${p[0]}</span><span class="price">${p[1]}</span></div>`
-        ).join('');
-    } else {
-        partsList.innerHTML = '<p>لا توجد قطع غيار مقترحة</p>';
+    if (partsList) {
+        if (result.parts && result.parts.length > 0) {
+            partsList.innerHTML = result.parts.map(p => 
+                `<div class="part-item"><span>${p[0]}</span><span class="price">${p[1]}</span></div>`
+            ).join('');
+        } else {
+            partsList.innerHTML = '<p>لا توجد قطع غيار مقترحة</p>';
+        }
     }
 
     const videosGrid = document.getElementById('videosGrid');
-    if (result.videos && result.videos.length > 0) {
-        videosGrid.innerHTML = result.videos.map(v => 
-            `<div class="video-card"><div class="placeholder">🎬</div><span>${v}</span></div>`
-        ).join('');
-    } else {
-        videosGrid.innerHTML = '<p>لا توجد فيديوهات مقترحة</p>';
+    if (videosGrid) {
+        if (result.videos && result.videos.length > 0) {
+            videosGrid.innerHTML = result.videos.map(v => 
+                `<div class="video-card"><div class="placeholder">🎬</div><span>${v}</span></div>`
+            ).join('');
+        } else {
+            videosGrid.innerHTML = '<p>لا توجد فيديوهات مقترحة</p>';
+        }
     }
 
-    document.getElementById('techList').innerHTML = `
-        <div class="tech-card">
-            <div class="tech-avatar">👨‍🔧</div>
-            <div class="tech-info"><strong>أحمد للصيانة</strong><span>⭐ 4.8 | 📍 2.5 كم</span></div>
-            <button class="btn btn-primary btn-sm">طلب</button>
-        </div>
-        <div class="tech-card">
-            <div class="tech-avatar">👨‍💼</div>
-            <div class="tech-info"><strong>مركز النخبة</strong><span>⭐ 4.6 | 📍 4.1 كم</span></div>
-            <button class="btn btn-primary btn-sm">طلب</button>
-        </div>
-    `;
+    const techList = document.getElementById('techList');
+    if (techList) {
+        techList.innerHTML = `
+            <div class="tech-card">
+                <div class="tech-avatar">👨‍🔧</div>
+                <div class="tech-info"><strong>أحمد للصيانة</strong><span>⭐ 4.8 | 📍 2.5 كم</span></div>
+                <button class="btn btn-primary btn-sm">طلب</button>
+            </div>
+            <div class="tech-card">
+                <div class="tech-avatar">👨‍💼</div>
+                <div class="tech-info"><strong>مركز النخبة</strong><span>⭐ 4.6 | 📍 4.1 كم</span></div>
+                <button class="btn btn-primary btn-sm">طلب</button>
+            </div>
+        `;
+    }
 
-    addRequestButton(document.getElementById('deviceSelect').value, document.getElementById('problemDesc').value.trim());
-    addSpeakButton(result.diagnosis);
+    const deviceSelect = document.getElementById('deviceSelect');
+    const problemDesc = document.getElementById('problemDesc');
+    if (deviceSelect && problemDesc) {
+        addRequestButton(deviceSelect.value, problemDesc.value.trim());
+    }
+    if (result.diagnosis) {
+        addSpeakButton(result.diagnosis);
+    }
 
-    document.getElementById('resultContent').scrollIntoView({ behavior: 'smooth' });
+    if (resultContent) {
+        resultContent.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // ========== دالة زر الصوت ==========
@@ -206,9 +357,12 @@ function addRequestButton(device, problem) {
         </button>
     `;
     
-    document.getElementById('btnRequestService').addEventListener('click', function() {
-        createServiceRequest(device, problem);
-    });
+    const requestBtn = document.getElementById('btnRequestService');
+    if (requestBtn) {
+        requestBtn.addEventListener('click', function() {
+            createServiceRequest(device, problem);
+        });
+    }
 }
 
 // ========== دالة إنشاء طلب الصيانة ==========
@@ -217,8 +371,8 @@ function createServiceRequest(device, problem) {
     if (!currentUser) { alert('⚠️ الرجاء تسجيل الدخول أولاً'); window.location.href = 'login.html'; return; }
     
     const selectEl = document.getElementById('deviceSelect');
-    const deviceName = selectEl.options[selectEl.selectedIndex].text;
-    const deviceType = selectEl.value;
+    const deviceName = selectEl ? selectEl.options[selectEl.selectedIndex].text : 'جهاز';
+    const deviceType = selectEl ? selectEl.value : 'other';
     
     const newOrder = {
         id: Date.now(),
@@ -246,7 +400,7 @@ function createServiceRequest(device, problem) {
 }
 
 // ============================================
-// قاعدة بيانات الأعطال (78 جهاز ومركبة) - مختصرة
+// قاعدة بيانات الأعطال (78 جهاز ومركبة)
 // ============================================
 const data = {
     fridge: { diag: 'ضعف في التبريد بسبب تراكم الثلج أو خلل في الثرموستات.', parts: [['ثرموستات','450 ج.م'],['مروحة تبريد','800 ج.م'],['حساس حرارة','250 ج.م'],['كارت تحكم','1200 ج.م']] },
