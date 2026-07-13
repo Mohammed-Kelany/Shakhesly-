@@ -108,7 +108,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 .methods-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 .method-card { background: var(--white); border-radius: var(--radius); padding: 40px 30px; text-align: center; box-shadow: var(--shadow); border: 3px solid #2563EB; transition: var(--transition); position: relative; overflow: hidden; }
 .method-card:hover { transform: translateY(-12px) scale(1.02); box-shadow: var(--shadow-lg); }
-.method-card::before { content: ''; position: absolute; width: 100%; height: 100%; opacity: 0.04; background-size: cover; background-repeat: no-repeat; background-position: center; top: 0; left: 0; pointer-events: none; transition: 0.4s; z-index: 0; }
+.method-card::before { content: ''; position: absolute; width: 100%; height: 100%; opacity: 0.08; background-size: cover; background-repeat: no-repeat; background-position: center; top: 0; left: 0; pointer-events: none; transition: 0.4s; z-index: 0; }
 .method-card:nth-child(1)::before { background-image: url('./bg-keyboard.png'); }
 .method-card:nth-child(2)::before { background-image: url('./bg-microphone.png'); }
 .method-card:nth-child(3)::before { background-image: url('./bg-camera.png'); }
