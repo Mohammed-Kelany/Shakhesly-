@@ -1,4 +1,4 @@
-// ملف js/firebase-config.js
+// ملف firebase-config.js
 const firebaseConfig = {
   apiKey: "AIzaSyCFuPSkwJhA6mgPdXB13w4SJY1VQ1W_btE",
   authDomain: "shakhesly-ai.firebaseapp.com",
