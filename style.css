@@ -574,3 +574,93 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
     height: 35px;
     width: auto;
 }  */
+/* ==========================================
+   إصلاحات الجوال (Responsive Design)
+   أضف هذا الكود في نهاية ملف style.css
+   ========================================== */
+
+@media (max-width: 1024px) {
+    .hero-title { font-size: 2.4rem; }
+    .hero-stats { gap: 25px; }
+    .hero-visual { min-height: 350px; }
+}
+
+@media (max-width: 768px) {
+    /* إصلاح الهيدر والقائمة */
+    .header .container {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 0;
+    }
+    .nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background: var(--white);
+        padding: 100px 30px 30px;
+        box-shadow: var(--shadow-xl);
+        transition: var(--transition);
+        z-index: 1000;
+    }
+    .nav.active { right: 0; }
+    .nav-list { flex-direction: column; gap: 24px; }
+    .header-actions { display: none; }
+    .mobile-toggle { display: flex; }
+
+    /* إصلاح القسم الرئيسي */
+    .hero { padding: 120px 0 60px; }
+    .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .hero-content { max-width: 100%; order: 2; }
+    .hero-title { font-size: 2rem; }
+    .hero-buttons {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    .hero-buttons .btn { width: 80%; margin-bottom: 10px; }
+    .hero-stats { justify-content: center; gap: 30px; }
+    .hero-visual { min-height: 300px; order: 1; margin-bottom: 20px; }
+    .hero-circle { width: 300px; height: 300px; }
+    .hero-slider { width: 250px; height: 300px; margin: 0 auto; }
+    .slider-img { max-width: 180px; max-height: 200px; }
+    .floating-badge { bottom: 10px; left: 50%; transform: translateX(-50%); }
+
+    /* إصلاح الكروت */
+    .methods-grid, .features-grid, .footer-grid, .gates-grid {
+        grid-template-columns: 1fr;
+    }
+    .method-card, .feature-card { margin: 0 10px; }
+
+    /* إصلاح القائمة الجانبية للصفحات الداخلية */
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px;
+        gap: 10px;
+        white-space: nowrap;
+        bottom: auto;
+    }
+    .sidebar-logo { margin-bottom: 0; margin-right: 15px; }
+    .sidebar-menu { flex-direction: row; }
+    .sidebar-logout { margin-top: 0; white-space: nowrap; }
+    .main-content { margin-right: 0; }
+
+    /* إصلاح قائمة اختيار التخصصات */
+    .specialization-checkboxes { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+    .hero-title { font-size: 1.7rem; }
+    .hero-stats { flex-direction: column; gap: 20px; }
+    .btn-lg { width: 100%; }
+    .stats-grid { grid-template-columns: 1fr; }
+} 
+
