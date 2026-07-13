@@ -7,21 +7,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="diagnose.css">
+    <link rel="stylesheet" href="css/diagnose.css">
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563EB">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="شخصلي">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
 </head>
 <body>
 
     <header class="header">
         <div class="container">
             <a href="index.html" class="logo">
-                <img src="logo.png" alt="شخصلي" class="logo-img">
+                <img src="assets/images/logo.png" alt="شخصلي" class="logo-img">
             </a>
             <nav class="nav">
                 <a href="index.html">الرئيسية</a>
@@ -41,7 +42,6 @@
             <div class="diagnose-grid">
                 <div class="input-section" data-aos="fade-left">
                     
-                    <!-- إعدادات API (اختياري) -->
                     <div class="card" style="background:#FFF7ED;border:1px solid #FED7AA;">
                         <details>
                             <summary style="cursor:pointer;font-weight:700;color:#F59E0B;">⚡ تفعيل الذكاء الاصطناعي (اختياري)</summary>
@@ -97,8 +97,19 @@
                         <div class="input-actions">
                             <button class="btn btn-outline btn-sm" id="btnVoice"><i class="fas fa-microphone"></i> صوتي</button>
                             <button class="btn btn-outline btn-sm" id="btnCamera"><i class="fas fa-camera"></i> صورة</button>
+                            <!-- مدخل الملفات المخفي -->
                             <input type="file" id="imageInput" accept="image/*" hidden>
+                            <input type="file" id="cameraInput" accept="image/*" capture="camera" hidden>
                         </div>
+                        
+                        <!-- معاينة الصورة المرفوعة -->
+                        <div id="imagePreviewContainer" style="display:none; margin-top:15px; text-align:center;">
+                            <img id="imagePreview" src="" alt="معاينة الصورة" style="max-width:100%; max-height:200px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                            <button class="btn btn-outline btn-sm" id="btnRemoveImage" style="margin-top:8px;">
+                                <i class="fas fa-times"></i> إزالة الصورة
+                            </button>
+                        </div>
+                        
                         <button class="btn btn-primary btn-block btn-diagnose" id="btnDiagnose"><i class="fas fa-stethoscope"></i> شخّص الآن</button>
                     </div>
                 </div>
@@ -142,9 +153,8 @@
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="diagnose.js"></script>
+    <script src="js/diagnose.js"></script>
     
-    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
