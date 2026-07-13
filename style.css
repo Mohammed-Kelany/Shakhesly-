@@ -94,7 +94,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 .hero-slider { position: relative; z-index: 1; width: 300px; height: 350px; display: flex; align-items: center; justify-content: center; }
 .slider-item { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transform: scale(0.8) translateY(20px); transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
 .slider-item.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
-.slider-img { max-width: 280px; max-height: 300px; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.15)); animation: floatEmoji 3s ease-in-out infinite; }
+.slider-img { max-width: 500px; max-height: 430px; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.15)); animation: floatEmoji 3s ease-in-out infinite; }
 .floating-badge { position: absolute; bottom: 30px; left: 20px; background: var(--white); padding: 10px 20px; border-radius: 50px; box-shadow: var(--shadow-md); font-weight: 700; font-size: 0.85rem; color: var(--primary); display: flex; align-items: center; gap: 8px; z-index: 2; }
 @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
