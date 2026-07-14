@@ -575,3 +575,192 @@ body {
     .tabs { flex-direction: column; }
     .tab { text-align: center; }
 } 
+/* ==========================================
+   إصلاحات الجوال (Responsive Design)
+   ========================================== */
+
+@media (max-width: 768px) {
+    /* إصلاح الشريط الجانبي */
+    .dashboard {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px 15px;
+        gap: 10px;
+        white-space: nowrap;
+        bottom: auto;
+    }
+    
+    .sidebar-logo {
+        margin-bottom: 0;
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+    
+    .sidebar-logo img {
+        height: 24px;
+    }
+    
+    .sidebar-menu {
+        flex-direction: row;
+        gap: 5px;
+    }
+    
+    .sidebar-menu a {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    
+    .sidebar-logout {
+        margin-top: 0;
+        white-space: nowrap;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    /* إصلاح المحتوى الرئيسي */
+    .main-content {
+        margin-right: 0;
+        padding: 15px;
+    }
+    
+    /* إصلاح رأس الصفحة */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    /* إصلاح الإحصائيات */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-number {
+        font-size: 1.4rem;
+    }
+    
+    /* إصلاح التبويبات */
+    .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 5px;
+        padding-bottom: 5px;
+    }
+    
+    .tab {
+        white-space: nowrap;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+    
+    /* إصلاح كروت الطلبات */
+    .order-card {
+        flex-direction: column;
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    .order-info {
+        min-width: 100%;
+    }
+    
+    .order-device {
+        font-size: 1rem;
+    }
+    
+    .order-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .order-status {
+        align-self: flex-start;
+    }
+    
+    .order-actions {
+        min-width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+    
+    .order-actions .btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    /* إصلاح العروض */
+    .bid-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .bid-item .btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* إصلاح النوافذ المنبثقة */
+    .modal {
+        width: 95%;
+        padding: 20px;
+        max-width: none;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* إصلاح نجوم التقييم */
+    .stars {
+        font-size: 2rem;
+        gap: 5px;
+    }
+    
+    /* إصلاح الأزرار */
+    .btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-lg {
+        width: 100%;
+    }
+    
+    /* إصلاح الحالة الفارغة */
+    .empty-state {
+        padding: 40px 20px;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar-menu a {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}
