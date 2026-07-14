@@ -1,6 +1,6 @@
 /* ============================================
    شخصلي AI - تفاعلات صفحة تشخيص الأعطال
-   الإصدار: 5.3 (الكاميرا تعمل بشكل صحيح)
+   الإصدار: 5.3 (كامل - OpenAI + صوت + كاميرا + معاينة)
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagePreviewContainer = document.getElementById('imagePreviewContainer');
     const btnRemoveImage = document.getElementById('btnRemoveImage');
 
-    // ========== زر التشخيص الرئيسي ==========
+    // ========== زر التشخيص ==========
     if (btnDiagnose) {
         btnDiagnose.addEventListener('click', function() {
             const device = document.getElementById('deviceSelect').value;
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== 🆕 زر الكاميرا (نسخة محسنة) ==========
+    // ========== زر الكاميرا (نافذة اختيار المصدر) ==========
     if (btnCamera) {
         btnCamera.addEventListener('click', function() {
             showImageSourceOptions();
@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showImageSourceOptions() {
-        // إزالة أي نافذة سابقة
         const oldOverlay = document.getElementById('cameraOptionsOverlay');
         if (oldOverlay) oldOverlay.remove();
 
@@ -96,35 +95,27 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(overlay);
         document.body.style.overflow = 'hidden';
         
-        // زر فتح الكاميرا
         document.getElementById('btnOpenCamera').addEventListener('click', function() {
             closeImageModal(overlay);
-            // تعيين capture للكاميرا الخلفية لفتح الكاميرا مباشرة
             if (cameraInput) {
                 cameraInput.setAttribute('capture', 'environment');
                 cameraInput.click();
             }
         });
         
-        // زر فتح المعرض
         document.getElementById('btnOpenGallery').addEventListener('click', function() {
             closeImageModal(overlay);
-            // فتح المعرض
             if (imageInput) {
                 imageInput.click();
             }
         });
         
-        // زر الإغلاق
         document.getElementById('closeImageOptions').addEventListener('click', function() {
             closeImageModal(overlay);
         });
         
-        // إغلاق عند الضغط خارج النافذة
         overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                closeImageModal(overlay);
-            }
+            if (e.target === overlay) closeImageModal(overlay);
         });
     }
     
@@ -135,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = '';
     }
 
-    // معالجة اختيار صورة من المعرض
+    // ========== معالجة الصور ==========
     if (imageInput) {
         imageInput.addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
@@ -144,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // معالجة التقاط صورة من الكاميرا
     if (cameraInput) {
         cameraInput.addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
@@ -153,7 +143,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // دالة عرض معاينة الصورة
     function displayImagePreview(file) {
         if (!imagePreview || !imagePreviewContainer) return;
         const reader = new FileReader();
@@ -164,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsDataURL(file);
     }
 
-    // زر إزالة الصورة
     if (btnRemoveImage) {
         btnRemoveImage.addEventListener('click', function() {
             if (imagePreview) imagePreview.src = '';
@@ -375,7 +363,6 @@ function createServiceRequest(device, problem) {
     const deviceType = selectEl ? selectEl.value : 'other';
     
     const newOrder = {
-        id: Date.now(),
         userId: currentUser.id,
         customerName: currentUser.fullName,
         deviceType: deviceType,
@@ -388,15 +375,18 @@ function createServiceRequest(device, problem) {
         price: null,
         location: currentUser.location || 'غير محدد',
         rated: false,
-        createdAt: new Date().toISOString()
+        createdAt: firebase.database.ServerValue.TIMESTAMP
     };
     
-    const allOrders = JSON.parse(localStorage.getItem('shakhesly_orders')) || [];
-    allOrders.push(newOrder);
-    localStorage.setItem('shakhesly_orders', JSON.stringify(allOrders));
-    
-    alert('✅ تم إرسال طلب الصيانة للفنيين!\nستظهر العروض في صفحة "طلباتي" قريباً.');
-    window.location.href = 'orders.html';
+    db.ref('orders').push(newOrder)
+        .then(() => {
+            alert('✅ تم إرسال طلب الصيانة للفنيين!\nستظهر العروض في صفحة "طلباتي" قريباً.');
+            window.location.href = 'orders.html';
+        })
+        .catch(err => {
+            console.error('خطأ في إرسال الطلب:', err);
+            alert('❌ حدث خطأ. حاول مرة أخرى.');
+        });
 }
 
 // ============================================
@@ -424,4 +414,4 @@ const data = {
     smartphone: { diag: 'لا يشحن أو الشاشة مكسورة.', parts: [['بطارية','400 ج.م'],['شاشة','1200 ج.م'],['بورت شحن','200 ج.م']] },
     smartwatch: { diag: 'لا تشحن أو الشاشة لا تستجيب.', parts: [['بطارية','300 ج.م'],['شاشة','600 ج.م']] },
     other: { diag: 'يرجى وصف المشكلة بدقة ليتم تشخيصها بواسطة فني متخصص.', parts: [['فحص فني','200 ج.م'],['صيانة عامة','300 ج.م']] }
-}; 
+};
