@@ -1,8 +1,31 @@
+// ========== حماية لوحة التحكم بكلمة مرور ==========
+const ADMIN_PASSWORD = 'admin123'; // 🎯 غير كلمة المرور دي
+
+function checkAdminPassword() {
+    if (sessionStorage.getItem('admin_logged_in') === 'true') {
+        return true;
+    }
+    
+    const password = prompt('🔒 أدخل كلمة مرور لوحة التحكم:');
+    if (password === ADMIN_PASSWORD) {
+        sessionStorage.setItem('admin_logged_in', 'true');
+        return true;
+    } else if (password === null) {
+        window.location.href = 'index.html';
+        return false;
+    } else {
+        alert('❌ كلمة المرور غير صحيحة');
+        window.location.href = 'index.html';
+        return false;
+    }
+}
+
+if (!checkAdminPassword()) {
+    throw new Error('تم رفض الوصول');
+}
+
 // ========== لوحة تحكم Admin ==========
 document.addEventListener('DOMContentLoaded', function () {
-    // التحقق من صلاحية admin (حالياً أي حد يقدر يفتحها)
-    // يمكنك إضافة كلمة مرور admin هنا
-    
     loadStats();
     loadUsers();
     loadTechs();
@@ -21,17 +44,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ========== تحميل الإحصائيات ==========
 function loadStats() {
-    // عدد المستخدمين
     db.ref('users').orderByChild('type').equalTo('user').once('value').then(snapshot => {
         document.getElementById('totalUsers').textContent = snapshot.numChildren();
     });
 
-    // عدد الفنيين
     db.ref('users').orderByChild('type').equalTo('tech').once('value').then(snapshot => {
         document.getElementById('totalTechs').textContent = snapshot.numChildren();
     });
 
-    // عدد الطلبات
     db.ref('orders').once('value').then(snapshot => {
         document.getElementById('totalOrders').textContent = snapshot.numChildren();
         let completed = 0;
@@ -151,6 +171,6 @@ function deleteUser(userId) {
 
 // ========== تسجيل الخروج ==========
 function logout() {
-    localStorage.removeItem('shakhesly_current_user');
+    sessionStorage.removeItem('admin_logged_in');
     window.location.href = 'index.html';
 }
