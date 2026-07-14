@@ -128,46 +128,37 @@ function setLanguage(lang) {
 
 // تطبيق الترجمة على العناصر اللي فيها data-translate
 function applyTranslations() {
-    const lang = getCurrentLanguage();
+    var lang = getCurrentLanguage();
     
     // تغيير اتجاه الصفحة
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     
-    // ترجمة العناصر اللي فيها data-translate (يدعم innerHTML)
-    document.querySelectorAll('[data-translate]').forEach(el => {
-        const key = el.getAttribute('data-translate');
-        if (translations[lang]?.[key]) {
-            // استخدم innerHTML عشان يدعم <span> و <strong> وغيره
+    // ترجمة العناصر اللي فيها data-translate (باستخدام innerHTML)
+    document.querySelectorAll('[data-translate]').forEach(function(el) {
+        var key = el.getAttribute('data-translate');
+        if (translations[lang] && translations[lang][key]) {
             el.innerHTML = translations[lang][key];
         }
     });
     
     // ترجمة placeholders
-    document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-translate-placeholder');
-        if (translations[lang]?.[key]) {
+    document.querySelectorAll('[data-translate-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-translate-placeholder');
+        if (translations[lang] && translations[lang][key]) {
             el.placeholder = translations[lang][key];
-        }
-    });
-    
-    // ترجمة title
-    document.querySelectorAll('[data-translate-title]').forEach(el => {
-        const key = el.getAttribute('data-translate-title');
-        if (translations[lang]?.[key]) {
-            el.title = translations[lang][key];
         }
     });
 }
 
 // إضافة زر تغيير اللغة
 function addLanguageToggle() {
-    const container = document.querySelector('.header-actions');
+    var container = document.querySelector('.header-actions');
     if (!container) return;
     
-    const currentLang = getCurrentLanguage();
+    var currentLang = getCurrentLanguage();
     
-    const langBtn = document.createElement('button');
+    var langBtn = document.createElement('button');
     langBtn.className = 'btn btn-outline';
     langBtn.style.cssText = 'padding:8px 12px;font-size:0.85rem;';
     langBtn.innerHTML = currentLang === 'ar' ? '🇬🇧 EN' : '🇸🇦 AR';
@@ -175,11 +166,11 @@ function addLanguageToggle() {
     
     langBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        const newLang = currentLang === 'ar' ? 'en' : 'ar';
+        var newLang = currentLang === 'ar' ? 'en' : 'ar';
         setLanguage(newLang);
     });
     
-    container.prepend(langBtn);
+    container.insertBefore(langBtn, container.firstChild);
 }
 
 // تشغيل الترجمة عند تحميل الصفحة
