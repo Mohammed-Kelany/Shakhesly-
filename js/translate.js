@@ -5,7 +5,7 @@ const translations = {
     ar: {
         // الصفحة الرئيسية
         'home': 'الرئيسية',
-        'diagnose_fault': 'تشخيص عطل',
+        'diagnose_fault': '🔍 تشخيص عطل',
         'about': 'عن شخصلي',
         'features': 'المميزات',
         'register': 'التسجيل',
@@ -60,7 +60,7 @@ const translations = {
     },
     en: {
         'home': 'Home',
-        'diagnose_fault': 'Diagnose Fault',
+        'diagnose_fault': '🔍 Diagnose Fault',
         'about': 'About Shakhesly',
         'features': 'Features',
         'register': 'Register',
@@ -126,12 +126,6 @@ function setLanguage(lang) {
     location.reload();
 }
 
-// ترجمة النص
-function translate(key) {
-    const lang = getCurrentLanguage();
-    return translations[lang]?.[key] || translations['ar'][key] || key;
-}
-
 // تطبيق الترجمة على العناصر اللي فيها data-translate
 function applyTranslations() {
     const lang = getCurrentLanguage();
@@ -140,11 +134,12 @@ function applyTranslations() {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     
-    // ترجمة العناصر اللي فيها data-translate
+    // ترجمة العناصر اللي فيها data-translate (يدعم innerHTML)
     document.querySelectorAll('[data-translate]').forEach(el => {
         const key = el.getAttribute('data-translate');
         if (translations[lang]?.[key]) {
-            el.textContent = translations[lang][key];
+            // استخدم innerHTML عشان يدعم <span> و <strong> وغيره
+            el.innerHTML = translations[lang][key];
         }
     });
     
@@ -153,6 +148,14 @@ function applyTranslations() {
         const key = el.getAttribute('data-translate-placeholder');
         if (translations[lang]?.[key]) {
             el.placeholder = translations[lang][key];
+        }
+    });
+    
+    // ترجمة title
+    document.querySelectorAll('[data-translate-title]').forEach(el => {
+        const key = el.getAttribute('data-translate-title');
+        if (translations[lang]?.[key]) {
+            el.title = translations[lang][key];
         }
     });
 }
