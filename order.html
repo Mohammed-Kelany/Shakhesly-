@@ -8,19 +8,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="css/orders.css">
+    
     <!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2563EB">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="شخصلي">
-<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
-<script src="js/crypto-js.min.js"></script>
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="js/firebase-config.js"></script> 
-
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="شخصلي">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
 </head>
 <body>
 
@@ -28,9 +28,8 @@
         <!-- ========== الشريط الجانبي ========== -->
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <img src="assets/images/logo.png" alt="شخصلي" style="max-width: 130px; height: auto; display: block; margin: 0 auto;">
+                <img src="assets/images/logo.png" alt="شخصلي" style="height:32px;width:auto;display:block;margin:0 auto;">
             </div>
-            
             <nav class="sidebar-menu">
                 <a href="dashboard-user.html"><span><i class="fas fa-home"></i> الرئيسية</span></a>
                 <a href="diagnose.html"><span><i class="fas fa-stethoscope"></i> تشخيص عطل</span></a>
@@ -153,18 +152,14 @@
         const badge = document.getElementById('sidebarBadge');
         if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline'; }
     </script>
-    <!-- تسجيل Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('sw.js').then(function(registration) {
-                console.log('✅ Service Worker مسجل بنجاح');
-            }).catch(function(error) {
-                console.log('❌ فشل تسجيل Service Worker:', error);
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js');
             });
-        });
-    }
-</script> 
-
+        }
+    </script>
 </body>
-</html> 
+</html>
