@@ -1,0 +1,156 @@
+// ========== لوحة تحكم Admin ==========
+document.addEventListener('DOMContentLoaded', function () {
+    // التحقق من صلاحية admin (حالياً أي حد يقدر يفتحها)
+    // يمكنك إضافة كلمة مرور admin هنا
+    
+    loadStats();
+    loadUsers();
+    loadTechs();
+    loadOrders();
+
+    // تبويبات
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('tab-' + this.getAttribute('data-tab')).classList.add('active');
+        });
+    });
+});
+
+// ========== تحميل الإحصائيات ==========
+function loadStats() {
+    // عدد المستخدمين
+    db.ref('users').orderByChild('type').equalTo('user').once('value').then(snapshot => {
+        document.getElementById('totalUsers').textContent = snapshot.numChildren();
+    });
+
+    // عدد الفنيين
+    db.ref('users').orderByChild('type').equalTo('tech').once('value').then(snapshot => {
+        document.getElementById('totalTechs').textContent = snapshot.numChildren();
+    });
+
+    // عدد الطلبات
+    db.ref('orders').once('value').then(snapshot => {
+        document.getElementById('totalOrders').textContent = snapshot.numChildren();
+        let completed = 0;
+        snapshot.forEach(child => {
+            if (child.val().status === 'completed') completed++;
+        });
+        document.getElementById('completedOrders').textContent = completed;
+    });
+}
+
+// ========== تحميل المستخدمين ==========
+function loadUsers() {
+    db.ref('users').orderByChild('type').equalTo('user').once('value').then(snapshot => {
+        const tbody = document.getElementById('usersTableBody');
+        if (snapshot.numChildren() === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">لا يوجد مستخدمين</td></tr>';
+            return;
+        }
+        let html = '';
+        snapshot.forEach(child => {
+            const user = child.val();
+            const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-EG') : '—';
+            html += `
+                <tr>
+                    <td>👤 ${user.fullName || '—'}</td>
+                    <td>${user.email || '—'}</td>
+                    <td>${user.phone || '—'}</td>
+                    <td>${date}</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding:5px 12px;font-size:0.75rem;" onclick="deleteUser('${child.key}')">🗑️ حذف</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    });
+}
+
+// ========== تحميل الفنيين ==========
+function loadTechs() {
+    db.ref('users').orderByChild('type').equalTo('tech').once('value').then(snapshot => {
+        const tbody = document.getElementById('techsTableBody');
+        if (snapshot.numChildren() === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا يوجد فنيين</td></tr>';
+            return;
+        }
+        let html = '';
+        snapshot.forEach(child => {
+            const tech = child.val();
+            const hasId = tech.frontIdImage || tech.backIdImage;
+            html += `
+                <tr>
+                    <td>👨‍🔧 ${tech.fullName || '—'}</td>
+                    <td>${tech.specialization || '—'}</td>
+                    <td>${tech.experience ? tech.experience + ' سنوات' : '—'}</td>
+                    <td>${tech.location || '—'}</td>
+                    <td>${hasId ? '<span class="badge badge-success">✅ موجودة</span>' : '<span class="badge badge-warning">❌ لا توجد</span>'}</td>
+                    <td><span class="badge badge-info">نشط</span></td>
+                    <td>
+                        <button class="btn btn-danger" style="padding:5px 12px;font-size:0.75rem;" onclick="deleteUser('${child.key}')">🗑️ حذف</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    });
+}
+
+// ========== تحميل الطلبات ==========
+function loadOrders() {
+    db.ref('orders').once('value').then(snapshot => {
+        const tbody = document.getElementById('ordersTableBody');
+        if (snapshot.numChildren() === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا توجد طلبات</td></tr>';
+            return;
+        }
+        let html = '';
+        const orders = [];
+        snapshot.forEach(child => {
+            orders.push({ id: child.key, ...child.val() });
+        });
+        orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        
+        orders.forEach(order => {
+            const statusMap = {
+                'pending': '<span class="badge badge-warning">⏳ قيد الانتظار</span>',
+                'accepted': '<span class="badge badge-info">✅ مقبول</span>',
+                'completed': '<span class="badge badge-success">✔️ مكتمل</span>',
+                'cancelled': '<span class="badge badge-danger">❌ ملغي</span>'
+            };
+            html += `
+                <tr>
+                    <td>#${order.id?.substring(0, 6) || '—'}</td>
+                    <td>${order.customerName || '—'}</td>
+                    <td>${order.deviceName || '—'}</td>
+                    <td>${order.problem ? order.problem.substring(0, 30) + '...' : '—'}</td>
+                    <td>${order.techName || '—'}</td>
+                    <td>${statusMap[order.status] || order.status}</td>
+                    <td>${order.price ? order.price + ' ج.م' : '—'}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    });
+}
+
+// ========== حذف مستخدم ==========
+function deleteUser(userId) {
+    if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+    db.ref('users/' + userId).remove().then(() => {
+        alert('✅ تم حذف المستخدم بنجاح');
+        loadUsers();
+        loadTechs();
+        loadStats();
+    });
+}
+
+// ========== تسجيل الخروج ==========
+function logout() {
+    localStorage.removeItem('shakhesly_current_user');
+    window.location.href = 'index.html';
+}
