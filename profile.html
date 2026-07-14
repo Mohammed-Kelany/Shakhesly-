@@ -6,33 +6,37 @@
     <title>الملف الشخصي - شخصلي AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="css/profile.css">
+    
     <!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2563EB">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="شخصلي">
-<link rel="apple-touch-icon" href="assets/images/icon-192.png"> 
-<script src="js/crypto-js.min.js"></script>
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="js/firebase-config.js"></script> 
-
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563EB">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="شخصلي">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
 </head>
 <body>
 
     <div class="dashboard">
-        <!-- ========== الشريط الجانبي ========== -->
-        <aside class="sidebar">
-            <img src="assets/images/logo.png" class="logo-img">
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar" id="sidebar">
             <!-- المحتوى هيتضاف حسب نوع المستخدم -->
         </aside>
 
-        <!-- ========== المحتوى الرئيسي ========== -->
+        <!-- المحتوى الرئيسي -->
         <main class="main-content">
+            
+            <!-- 🆕 زر الرجوع -->
+            <a href="javascript:history.back()" class="back-link" style="display:inline-flex;align-items:center;gap:8px;color:#2563EB;font-weight:700;margin-bottom:20px;text-decoration:none;">
+                <i class="fas fa-arrow-right"></i> رجوع
+            </a>
             
             <!-- رأس الصفحة -->
             <div class="page-header">
@@ -84,26 +88,17 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="specialization">التخصص</label>
-                                    <select id="specialization">
-                                        <option value="">-- اختر التخصص --</option>
-                                        <option value="fridge">❄️ تبريد وتكييف</option>
-                                        <option value="washer">🌀 غسالات</option>
-                                        <option value="tv">📺 تلفزيونات وشاشات</option>
-                                        <option value="all">🔧 صيانة شاملة</option>
-                                        <option value="other">📦 أخرى</option>
-                                    </select>
+                                    <input type="text" id="specialization" placeholder="مثال: تبريد وتكييف">
                                 </div>
                                 <div class="form-group">
                                     <label for="experience">سنوات الخبرة</label>
                                     <input type="number" id="experience" placeholder="مثال: 5" min="0" max="50">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="location">منطقة الخدمة</label>
                                 <input type="text" id="location" placeholder="مثال: القاهرة - مدينة نصر">
                             </div>
-
                             <div class="form-group">
                                 <label for="about">نبذة عنك</label>
                                 <textarea id="about" rows="4" placeholder="اكتب نبذة عن خبراتك وخدماتك..."></textarea>
@@ -212,7 +207,7 @@
         </main>
     </div>
 
-    <!-- ========== نافذة تأكيد حذف الحساب ========== -->
+    <!-- نافذة تأكيد حذف الحساب -->
     <div class="modal-overlay" id="deleteAccountModal">
         <div class="modal modal-sm">
             <button class="modal-close" id="modalCloseDelete">&times;</button>
@@ -236,24 +231,16 @@
         </div>
     </div>
 
-    <script src="js/profile.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>AOS.init({duration:600,once:true});</script> 
-<!-- تسجيل Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('sw.js').then(function(registration) {
-                console.log('✅ Service Worker مسجل بنجاح');
-            }).catch(function(error) {
-                console.log('❌ فشل تسجيل Service Worker:', error);
+    <script src="js/profile.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js');
             });
-        });
-    }
-</script> 
-<!-- CryptoJS للتشفير -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script> 
-
-
+        }
+    </script>
 </body>
-</html> 
+</html>
