@@ -54,7 +54,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 }
 
 .header-actions .btn {
-    padding: 8px 14px;
+    padding: 6px 12px;
     font-size: 0.85rem;
     gap: 6px;
     white-space: nowrap;
