@@ -1,6 +1,6 @@
 /* ============================================
    شخصلي AI - تنسيقات صفحة طلباتي
-   الإصدار: 2.0 (مع نظام العروض + تأثيرات)
+   الإصدار: 3.0 (متجاوب مع الجوال)
    ============================================ */
 
 :root {
@@ -334,23 +334,6 @@ body {
     font-size: 1rem;
 }
 
-.bid-select {
-    padding: 6px 14px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: var(--transition);
-    border: none;
-    background: var(--primary);
-    color: var(--white);
-}
-
-.bid-select:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
-}
-
 /* ===== Order Actions ===== */
 .order-actions {
     display: flex;
@@ -532,49 +515,11 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Responsive ===== */
+/* ===== Responsive - Desktop ===== */
 @media (max-width: 1024px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 768px) {
-    .dashboard { flex-direction: column; }
-    
-    .sidebar {
-        position: relative;
-        width: 100%;
-        flex-direction: row;
-        overflow-x: auto;
-        padding: 15px;
-        bottom: auto;
-        gap: 10px;
-    }
-    
-    .sidebar-logo { margin-bottom: 0; white-space: nowrap; }
-    .sidebar-menu { flex-direction: row; }
-    .sidebar-logout { margin-top: 0; white-space: nowrap; }
-    
-    .main-content { margin-right: 0; }
-    
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    
-    .order-card {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .order-info { min-width: 100%; }
-    .order-meta { justify-content: center; }
-    .order-device { justify-content: center; }
-    .order-status { min-width: auto; }
-    .order-actions { justify-content: center; min-width: auto; }
-}
-
-@media (max-width: 480px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .tabs { flex-direction: column; }
-    .tab { text-align: center; }
-} 
 /* ==========================================
    إصلاحات الجوال (Responsive Design)
    ========================================== */
