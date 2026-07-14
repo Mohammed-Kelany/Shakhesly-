@@ -1,6 +1,6 @@
 /* ============================================
    شخصلي AI - تفاعلات صفحة تشخيص الأعطال
-   الإصدار: 5.5 (فيديوهات حسب وصف المستخدم + AI)
+   الإصدار: 5.6 (فيديوهات حسب الجهاز + وصف المستخدم + AI)
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -260,14 +260,37 @@ function displayResult(result) {
         }
     }
 
-    // ========== 🆕 فيديوهات يوتيوب حسب وصف المستخدم ==========
+    // ========== 🆕 فيديوهات يوتيوب حسب الجهاز المختار + وصف المستخدم ==========
     const videosGrid = document.getElementById('videosGrid');
     if (videosGrid) {
-        // نحصل على نص المشكلة من حقل الإدخال
+        // نجيب اسم الجهاز المختار
+        const deviceSelect = document.getElementById('deviceSelect');
+        const deviceName = deviceSelect?.selectedOptions[0]?.text || '';
+        // نجيب وصف المشكلة
         const userProblem = document.getElementById('problemDesc')?.value?.trim();
         
-        if (userProblem) {
-            // نبحث في يوتيوب عن نص المشكلة الذي كتبه المستخدم
+        if (deviceName && userProblem) {
+            // نبحث في يوتيوب عن: "اسم الجهاز + وصف المشكلة + تصليح"
+            const searchText = deviceName + ' ' + userProblem;
+            const searchQuery = encodeURIComponent(searchText + ' تصليح');
+            const youtubeUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
+            
+            videosGrid.innerHTML = `
+                <a href="${youtubeUrl}" target="_blank" rel="noopener" class="video-card" style="text-decoration:none;display:block;">
+                    <div class="placeholder" style="background:#FF0000;color:white;display:flex;align-items:center;justify-content:center;height:100px;border-radius:10px;font-size:2rem;">
+                        ▶️
+                    </div>
+                    <span style="display:block;padding:8px;font-size:0.8rem;font-weight:600;text-align:center;">🔍 ${deviceName}: ${userProblem.substring(0, 30)}...</span>
+                </a>
+                <a href="${youtubeUrl}" target="_blank" rel="noopener" class="video-card" style="text-decoration:none;display:block;">
+                    <div class="placeholder" style="background:#FF0000;color:white;display:flex;align-items:center;justify-content:center;height:100px;border-radius:10px;font-size:2rem;">
+                        ▶️
+                    </div>
+                    <span style="display:block;padding:8px;font-size:0.85rem;font-weight:600;text-align:center;">🎬 فيديو آخر عن ${deviceName}</span>
+                </a>
+            `;
+        } else if (userProblem) {
+            // لو مش موجود جهاز، نبحث بوصف المشكلة فقط
             const searchQuery = encodeURIComponent(userProblem + ' تصليح');
             const youtubeUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
             
@@ -276,13 +299,7 @@ function displayResult(result) {
                     <div class="placeholder" style="background:#FF0000;color:white;display:flex;align-items:center;justify-content:center;height:100px;border-radius:10px;font-size:2rem;">
                         ▶️
                     </div>
-                    <span style="display:block;padding:8px;font-size:0.85rem;font-weight:600;text-align:center;">🔍 البحث عن فيديوهات لـ: "${userProblem}"</span>
-                </a>
-                <a href="${youtubeUrl}" target="_blank" rel="noopener" class="video-card" style="text-decoration:none;display:block;">
-                    <div class="placeholder" style="background:#FF0000;color:white;display:flex;align-items:center;justify-content:center;height:100px;border-radius:10px;font-size:2rem;">
-                        ▶️
-                    </div>
-                    <span style="display:block;padding:8px;font-size:0.85rem;font-weight:600;text-align:center;">🎬 فيديو آخر مقترح</span>
+                    <span style="display:block;padding:8px;font-size:0.85rem;font-weight:600;text-align:center;">🔍 "${userProblem}"</span>
                 </a>
             `;
         } else {
@@ -306,10 +323,10 @@ function displayResult(result) {
         `;
     }
 
-    const deviceSelect = document.getElementById('deviceSelect');
+    const deviceSelect2 = document.getElementById('deviceSelect');
     const problemDesc = document.getElementById('problemDesc');
-    if (deviceSelect && problemDesc) {
-        addRequestButton(deviceSelect.value, problemDesc.value.trim());
+    if (deviceSelect2 && problemDesc) {
+        addRequestButton(deviceSelect2.value, problemDesc.value.trim());
     }
     if (result.diagnosis) {
         addSpeakButton(result.diagnosis);
