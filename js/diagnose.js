@@ -1,6 +1,6 @@
 /* ============================================
    شخصلي AI - تفاعلات صفحة تشخيص الأعطال
-   الإصدار: 5.6 (فيديوهات حسب الجهاز + وصف المستخدم + AI)
+   الإصدار: 5.7 (تشخيص ذكي + فيديوهات + AI)
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -179,22 +179,79 @@ function startDiagnosis(device, problem) {
                 if (aiResult) {
                     displayResult(aiResult);
                 } else {
-                    const localData = (typeof data !== 'undefined' && data[device]) ? data[device] : (typeof data !== 'undefined' ? data['other'] : null);
-                    if (localData) displayResult(localData);
+                    const smartResult = getSmartDiagnosis(device, problem);
+                    displayResult(smartResult);
                 }
             })
             .catch(() => {
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
-                const localData = (typeof data !== 'undefined' && data[device]) ? data[device] : (typeof data !== 'undefined' ? data['other'] : null);
-                if (localData) displayResult(localData);
+                const smartResult = getSmartDiagnosis(device, problem);
+                displayResult(smartResult);
             });
     } else {
         setTimeout(() => {
             if (loadingOverlay) loadingOverlay.style.display = 'none';
-            const localData = (typeof data !== 'undefined' && data[device]) ? data[device] : (typeof data !== 'undefined' ? data['other'] : null);
-            if (localData) displayResult(localData);
-        }, 2000);
+            const smartResult = getSmartDiagnosis(device, problem);
+            displayResult(smartResult);
+        }, 1500);
     }
+}
+
+// ========== دالة التشخيص المحلي الذكي ==========
+function getSmartDiagnosis(device, problem) {
+    const baseData = data[device] || data['other'];
+    const problemLower = problem.toLowerCase();
+    
+    let specificDiag = '';
+    let specificParts = [];
+    
+    // تحليل الكلمات المفتاحية
+    if (problemLower.includes('لا يبرد') || problemLower.includes('لا تبرد') || problemLower.includes('سخن') || problemLower.includes('حرارة') || problemLower.includes('تبريد')) {
+        specificDiag = 'مشكلة في نظام التبريد. قد يكون السبب: نقص غاز الفريون، اتساخ المكثف، أو خلل في الثرموستات. ينصح بفحص دائرة التبريد بالكامل.';
+        specificParts = [['غاز فريون','400-650 ج.م'], ['ثرموستات','250-450 ج.م'], ['تنظيف مكثف','150-300 ج.م'], ['فحص ضاغط','300-500 ج.م']];
+    }
+    else if (problemLower.includes('صوت') || problemLower.includes('ضجيج') || problemLower.includes('صوت عالي') || problemLower.includes('اهتزاز') || problemLower.includes('صرير')) {
+        specificDiag = 'وجود أصوات غير طبيعية تشير إلى: تآكل في الأجزاء الميكانيكية (البلي/الرولمان)، ارتخاء في البراغي أو المسامير، أو خلل في المحرك.';
+        specificParts = [['طقم بلي/رولمان','400-550 ج.م'], ['سير','150-250 ج.م'], ['فحص ميكانيكي','200-400 ج.م'], ['موتور','500-2000 ج.م']];
+    }
+    else if (problemLower.includes('تسرب') || problemLower.includes('مياه') || problemLower.includes('ماء') || problemLower.includes('ينقط') || problemLower.includes('تسريب')) {
+        specificDiag = 'تسرب المياه يشير إلى: تلف في الوصلات أو الخراطيم، انسداد في مصرف التصريف، أو خلل في مضخة التصريف.';
+        specificParts = [['خرطوم','100-200 ج.م'], ['طلمبة تصريف','400-500 ج.م'], ['جلدة/وصلات','50-150 ج.م'], ['تنظيف مصرف','100-200 ج.م']];
+    }
+    else if (problemLower.includes('لا يعمل') || problemLower.includes('مش شغال') || problemLower.includes('لا تشتغل') || problemLower.includes('لا تدور') || problemLower.includes('فصل') || problemLower.includes('لا يستجيب')) {
+        specificDiag = 'الجهاز لا يستجيب أو لا يعمل. الأسباب المحتملة: عطل في مصدر الطاقة، فيوز محروق، خلل في لوحة التحكم الإلكترونية، أو تلف في كابل الطاقة.';
+        specificParts = [['فيوز','50-100 ج.م'], ['كابل طاقة','100-250 ج.م'], ['كارت تحكم','500-1500 ج.م'], ['بور سبلاي','300-700 ج.م']];
+    }
+    else if (problemLower.includes('رائحة') || problemLower.includes('دخان') || problemLower.includes('شورت') || problemLower.includes('حرق') || problemLower.includes('احتراق') || problemLower.includes('شرارة')) {
+        specificDiag = '⚠️ تحذير: وجود دخان أو رائحة حرق يشير إلى تماس كهربائي أو احتراق في الأسلاك أو الموتور. يرجى فصل الجهاز فوراً عن الكهرباء وعدم استخدامه حتى يتم فحصه.';
+        specificParts = [['فحص كهربائي عاجل','300-500 ج.م'], ['أسلاك وتوصيلات','100-300 ج.م'], ['موتور','500-2000 ج.م'], ['كارت تحكم','500-1500 ج.م']];
+    }
+    else if (problemLower.includes('شاشة') || problemLower.includes('صورة') || problemLower.includes('عرض') || problemLower.includes('بيكسل') || problemLower.includes('سواد') || problemLower.includes('الشاشة')) {
+        specificDiag = 'مشكلة في الشاشة أو العرض. الأسباب المحتملة: عطل في الباكلايت، تلف في كابل الشاشة، أو خلل في كارت الشاشة.';
+        specificParts = [['شاشة/بانل','800-2000 ج.م'], ['كابل شاشة','100-300 ج.م'], ['كارت شاشة','500-1200 ج.م'], ['باكلايت','400-1000 ج.م']];
+    }
+    else if (problemLower.includes('بطارية') || problemLower.includes('شحن') || problemLower.includes('يفصل') || problemLower.includes('يفصل بسرعة') || problemLower.includes('بطاريته')) {
+        specificDiag = 'مشكلة في البطارية أو نظام الشحن. قد يكون السبب: تلف البطارية، خلل في منفذ الشحن، أو مشكلة في الشاحن نفسه.';
+        specificParts = [['بطارية جديدة','400-2000 ج.م'], ['شاحن','200-500 ج.م'], ['بورت شحن','150-300 ج.م'], ['كارت باور','400-800 ج.م']];
+    }
+    else if (problemLower.includes('نت') || problemLower.includes('واي فاي') || problemLower.includes('انترنت') || problemLower.includes('اتصال') || problemLower.includes('شبكة') || problemLower.includes('راوتر')) {
+        specificDiag = 'مشكلة في الاتصال بالشبكة أو الإنترنت. الأسباب المحتملة: إعدادات خاطئة، عطل في كارت الشبكة، أو مشكلة في الهوائي.';
+        specificParts = [['كارت شبكة','200-500 ج.م'], ['هوائي','50-150 ج.م'], ['ضبط إعدادات','100-200 ج.م']];
+    }
+    
+    if (specificDiag) {
+        return {
+            diagnosis: specificDiag,
+            parts: specificParts,
+            videos: [problem]
+        };
+    }
+    
+    return {
+        diagnosis: baseData.diag,
+        parts: baseData.parts,
+        videos: [problem]
+    };
 }
 
 // ========== دالة التواصل مع OpenAI ==========
@@ -260,17 +317,14 @@ function displayResult(result) {
         }
     }
 
-    // ========== 🆕 فيديوهات يوتيوب حسب الجهاز المختار + وصف المستخدم ==========
+    // ========== فيديوهات يوتيوب حسب الجهاز + وصف المستخدم ==========
     const videosGrid = document.getElementById('videosGrid');
     if (videosGrid) {
-        // نجيب اسم الجهاز المختار
         const deviceSelect = document.getElementById('deviceSelect');
         const deviceName = deviceSelect?.selectedOptions[0]?.text || '';
-        // نجيب وصف المشكلة
         const userProblem = document.getElementById('problemDesc')?.value?.trim();
         
         if (deviceName && userProblem) {
-            // نبحث في يوتيوب عن: "اسم الجهاز + وصف المشكلة + تصليح"
             const searchText = deviceName + ' ' + userProblem;
             const searchQuery = encodeURIComponent(searchText + ' تصليح');
             const youtubeUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
@@ -290,7 +344,6 @@ function displayResult(result) {
                 </a>
             `;
         } else if (userProblem) {
-            // لو مش موجود جهاز، نبحث بوصف المشكلة فقط
             const searchQuery = encodeURIComponent(userProblem + ' تصليح');
             const youtubeUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
             
@@ -426,7 +479,7 @@ function createServiceRequest(device, problem) {
 }
 
 // ============================================
-// قاعدة بيانات الأعطال (78 جهاز ومركبة)
+// قاعدة بيانات الأعطال الأساسية (تستخدم كمرجع)
 // ============================================
 const data = {
     fridge: { diag: 'ضعف في التبريد بسبب تراكم الثلج أو خلل في الثرموستات.', parts: [['ثرموستات','450 ج.م'],['مروحة تبريد','800 ج.م'],['حساس حرارة','250 ج.م'],['كارت تحكم','1200 ج.م']] },
