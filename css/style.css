@@ -45,28 +45,8 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%) scaleX(0); width: 24px; height: 3px; background: var(--primary); border-radius: 10px; transition: var(--transition); }
 .nav-link:hover, .nav-link.active { color: var(--primary); }
 .nav-link:hover::after, .nav-link.active::after { transform: translateX(-50%) scaleX(1); }
-
-/* تنسيق أزرار الهيدر (الحجم الصغير الذي تفضله) */
 .header-actions { display: flex; gap: 12px; }
-.header-actions .btn { 
-    padding: 8px 14px; 
-    font-size: 0.85rem; 
-    gap: 6px; 
-    white-space: nowrap; 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-}
-.header-actions .btn i { 
-    font-size: 0.9rem; 
-    width: 18px; 
-    text-align: center; 
-}
-.header-actions .btn:nth-child(1) i { color: #2563EB; }  /* أيقونة تسجيل الدخول */
-.header-actions .btn:nth-child(2) i { color: #ffffff; } /* أيقونة شخّص جهازك */
-.header-actions .btn:nth-child(3) i { color: #2563EB; }  /* أيقونة تسجيل مستخدم */
-.header-actions .btn:nth-child(4) i { color: #2563EB; }  /* أيقونة تسجيل فني */
-
+.header-actions .btn { padding: 8px 14px; font-size: 0.85rem; }
 .mobile-toggle { display: none; flex-direction: column; gap: 5px; background: none; padding: 5px; z-index: 1001; }
 .mobile-toggle span { width: 28px; height: 3px; background: var(--gray-800); border-radius: 5px; transition: var(--transition); }
 .mobile-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
@@ -94,7 +74,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 .hero-slider { position: relative; z-index: 1; width: 300px; height: 350px; display: flex; align-items: center; justify-content: center; }
 .slider-item { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transform: scale(0.8) translateY(20px); transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
 .slider-item.active { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
-.slider-img { max-width: 500px; max-height: 430px; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.15)); animation: floatEmoji 3s ease-in-out infinite; }
+.slider-img { max-width: 280px; max-height: 300px; object-fit: contain; filter: drop-shadow(0 15px 30px rgba(0,0,0,0.15)); animation: floatEmoji 3s ease-in-out infinite; }
 .floating-badge { position: absolute; bottom: 30px; left: 20px; background: var(--white); padding: 10px 20px; border-radius: 50px; box-shadow: var(--shadow-md); font-weight: 700; font-size: 0.85rem; color: var(--primary); display: flex; align-items: center; gap: 8px; z-index: 2; }
 @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
@@ -107,12 +87,12 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 .diagnosis-methods { padding: 80px 0; background: var(--gray-50); }
 .methods-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 .method-card { background: var(--white); border-radius: var(--radius); padding: 40px 30px; text-align: center; box-shadow: var(--shadow); border: 3px solid #2563EB; transition: var(--transition); position: relative; overflow: hidden; }
-.method-card:hover { transform: translateY(-12px) scale(1.02); box-shadow: var(--shadow-lg); }
-.method-card::before { content: ''; position: absolute; width: 100%; height: 100%; opacity: 0.4; background-size: cover; background-repeat: no-repeat; background-position: center; top: 0; left: 0; pointer-events: none; transition: 0.4s; z-index: 0; }
-.method-card:nth-child(1)::before { background-image: url('../assets/images/bg-keyboard.png'); }
-.method-card:nth-child(2)::before { background-image: url('../assets/images/bg-microphone.png'); }
-.method-card:nth-child(3)::before { background-image: url('../assets/images/bg-camera.png'); }
-.method-card:hover::before { opacity: 0.08; transform: scale(1.05); }
+.method-card:hover { transform: translateY(-12px) scale(1.03); box-shadow: var(--shadow-lg); }
+.method-card::before { content: ''; position: absolute; width: 100%; height: 100%; opacity: 0.04; background-size: cover; background-repeat: no-repeat; background-position: center; top: 0; left: 0; pointer-events: none; transition: 0.4s; z-index: 0; }
+.method-card:nth-child(1)::before { background-image: url('assets/images/bg-keyboard.png'); }
+.method-card:nth-child(2)::before { background-image: url('assets/images/bg-microphone.png'); }
+.method-card:nth-child(3)::before { background-image: url('assets/images/bg-camera.png'); }
+.method-card:hover::before { opacity: 0.15; transform: scale(1.05); }
 .method-icon { width: 80px; height: 80px; background: var(--primary-bg); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 2rem; transition: var(--transition); position: relative; z-index: 1; }
 .method-card:hover .method-icon { background: var(--primary); color: var(--white); transform: rotate(10deg) scale(1.15); }
 .method-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; position: relative; z-index: 1; }
@@ -158,10 +138,6 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 .social-links { display: flex; gap: 12px; margin-top: 24px; }
 .social-links a { width: 42px; height: 42px; background: rgba(255,255,255,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 1.1rem; transition: var(--transition); }
 .social-links a:hover { background: var(--primary); transform: translateY(-4px); }
-.social-links a:hover .fa-facebook-f { color: #1877F2; }
-.social-links a:hover .fa-twitter { color: #000; }
-.social-links a:hover .fa-instagram { color: #E4405F; }
-.social-links a:hover .fa-whatsapp { color: #25D366; }
 .footer-bottom { text-align: center; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.08); color: var(--gray-500); font-size: 0.9rem; }
 
 /* ===== خلفية متحركة ===== */
@@ -193,14 +169,21 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
 /* ===== إصلاحات الجوال (Responsive) ===== */
 @media (max-width: 1024px) {
     .hero-title { font-size: 2.4rem; }
+    .hero-stats { gap: 25px; }
+    .hero-visual { min-height: 350px; }
 }
+
 @media (max-width: 768px) {
+    /* Header */
     .header .container { flex-wrap: wrap; height: auto; padding: 10px 0; }
     .nav { position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: var(--white); padding: 100px 30px 30px; box-shadow: var(--shadow-xl); transition: var(--transition); z-index: 1000; }
     .nav.active { right: 0; }
     .nav-list { flex-direction: column; gap: 24px; }
     .header-actions { display: none; }
     .mobile-toggle { display: flex; }
+    
+    /* Hero */
+    .hero { padding: 120px 0 60px; }
     .hero .container { grid-template-columns: 1fr; text-align: center; }
     .hero-content { max-width: 100%; order: 2; }
     .hero-title { font-size: 2rem; }
@@ -211,12 +194,20 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
     .hero-slider { width: 250px; height: 300px; }
     .slider-img { max-width: 200px; max-height: 220px; }
     .floating-badge { bottom: 10px; left: 50%; transform: translateX(-50%); }
+    
+    /* Methods & Features */
     .methods-grid, .features-grid, .gates-grid, .footer-grid { grid-template-columns: 1fr; }
+    .method-card, .feature-card { margin: 0 10px; }
+    
+    /* Sidebar for internal pages */
     .sidebar { position: relative; width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; gap: 10px; white-space: nowrap; }
     .sidebar-menu { flex-direction: row; }
     .main-content { margin-right: 0; }
+    .specialization-checkboxes { grid-template-columns: 1fr; }
 }
+
 @media (max-width: 480px) {
     .hero-title { font-size: 1.7rem; }
     .hero-stats { flex-direction: column; gap: 20px; }
-} 
+    .btn-lg { width: 100%; }
+}
