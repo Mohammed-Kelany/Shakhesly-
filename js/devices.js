@@ -236,4 +236,4 @@ function showNotification(msg, type) {
     document.body.appendChild(n);
     setTimeout(() => { n.remove(); }, 3000);
 }
-function logout() { localStorage.removeItem('shakhesly_current_user'); window.location.href = 'index.html'; } 
+function logout() { localStorage.removeItem('shakhesly_current_user'); window.location.href = 'index.html'; }
