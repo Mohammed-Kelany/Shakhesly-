@@ -1,36 +1,30 @@
-/* ============================================
-   شخصلي AI - تفاعلات صفحة الملف الشخصي
-   ============================================ */
-   const SECRET_KEY = 'ShakheslyAI2024SecretKey!@';
-
-function encryptPassword(password) {
-    return CryptoJS.AES.encrypt(password, SECRET_KEY).toString();
-}
-
-function decryptPassword(encryptedPassword) {
-    const bytes = CryptoJS.AES.decrypt(encryptedPassword, SECRET_KEY);
-    return bytes.toString(CryptoJS.enc.Utf8);
-} 
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // التحقق من تسجيل الدخول
+// ========== الملف الشخصي - Firebase ==========
+document.addEventListener('DOMContentLoaded', function () {
     const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    if (!currentUser) {
-        window.location.href = 'index.html';
-        return;
-    }
+    if (!currentUser) { window.location.href = 'index.html'; return; }
 
-    // ========== بناء الشريط الجانبي ==========
     buildSidebar(currentUser);
 
-    // ========== تحميل بيانات المستخدم ==========
-    loadUserData(currentUser);
+    // تحميل بيانات المستخدم من Firebase
+    if (currentUser.id) {
+        db.ref('users/' + currentUser.id).once('value').then(snapshot => {
+            const userData = snapshot.val();
+            if (userData) {
+                // دمج بيانات الجلسة مع بيانات Firebase
+                const fullUser = { ...currentUser, ...userData, id: currentUser.id };
+                loadUserData(fullUser);
+            } else {
+                // إذا لم توجد بيانات في Firebase، استخدم بيانات الجلسة
+                loadUserData(currentUser);
+            }
+        });
+    } else {
+        loadUserData(currentUser);
+    }
 
-    // ========== تبويبات ==========
+    // تبويبات
     document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', function() {
+        tab.addEventListener('click', function () {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             this.classList.add('active');
@@ -39,52 +33,50 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ========== حفظ المعلومات الشخصية ==========
-    document.getElementById('infoForm').addEventListener('submit', savePersonalInfo);
+    // حفظ المعلومات الشخصية
+    document.getElementById('infoForm')?.addEventListener('submit', savePersonalInfo);
 
-    // ========== تغيير كلمة المرور ==========
-    document.getElementById('passwordForm').addEventListener('submit', changePassword);
-    document.getElementById('newPassword').addEventListener('input', checkPasswordStrength);
+    // تغيير كلمة المرور
+    document.getElementById('passwordForm')?.addEventListener('submit', changePassword);
+    document.getElementById('newPassword')?.addEventListener('input', checkPasswordStrength);
 
-    // ========== حفظ الإعدادات ==========
-    document.getElementById('btnSaveSettings').addEventListener('click', saveSettings);
+    // حفظ الإعدادات
+    document.getElementById('btnSaveSettings')?.addEventListener('click', saveSettings);
 
-    // ========== حذف الحساب ==========
-    document.getElementById('btnDeleteAccount').addEventListener('click', openDeleteModal);
-    document.getElementById('modalCloseDelete').addEventListener('click', closeDeleteModal);
-    document.getElementById('btnCancelDelete').addEventListener('click', closeDeleteModal);
-    document.getElementById('btnConfirmDelete').addEventListener('click', deleteAccount);
-    document.getElementById('deleteAccountModal').addEventListener('click', function(e) {
+    // حذف الحساب
+    document.getElementById('btnDeleteAccount')?.addEventListener('click', openDeleteModal);
+    document.getElementById('modalCloseDelete')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('btnCancelDelete')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('btnConfirmDelete')?.addEventListener('click', deleteAccount);
+    document.getElementById('deleteAccountModal')?.addEventListener('click', function (e) {
         if (e.target === this) closeDeleteModal();
     });
 });
 
-/* ==============================
-   بناء الشريط الجانبي
-   ============================== */
+// ========== بناء الشريط الجانبي ==========
 function buildSidebar(user) {
     const sidebar = document.getElementById('sidebar');
-    
     if (user.type === 'tech') {
         sidebar.innerHTML = `
-            <div class="sidebar-logo">🔧 شخصلي</div>
+            <div class="sidebar-logo"><img src="assets/images/logo.png" alt="شخصلي" style="height:32px;width:auto;"></div>
             <nav class="sidebar-menu">
                 <a href="dashboard-tech.html"><i class="fas fa-home"></i> الرئيسية</a>
                 <a href="incoming-orders.html"><i class="fas fa-tasks"></i> الطلبات الواردة</a>
-                <a href="#"><i class="fas fa-check-circle"></i> المكتملة</a>
-                <a href="#"><i class="fas fa-star"></i> تقييماتي</a>
+                <a href="ratings.html"><i class="fas fa-star"></i> تقييماتي</a>
+                <a href="notifications.html"><i class="fas fa-bell"></i> الإشعارات</a>
                 <a href="profile.html" class="active"><i class="fas fa-user-cog"></i> الملف الشخصي</a>
             </nav>
             <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
         `;
     } else {
         sidebar.innerHTML = `
-            <div class="sidebar-logo">🤖 شخصلي</div>
+            <div class="sidebar-logo"><img src="assets/images/logo.png" alt="شخصلي" style="height:32px;width:auto;"></div>
             <nav class="sidebar-menu">
                 <a href="dashboard-user.html"><i class="fas fa-home"></i> الرئيسية</a>
                 <a href="diagnose.html"><i class="fas fa-stethoscope"></i> تشخيص عطل</a>
                 <a href="devices.html"><i class="fas fa-mobile-alt"></i> أجهزتي</a>
                 <a href="orders.html"><i class="fas fa-history"></i> طلباتي</a>
+                <a href="notifications.html"><i class="fas fa-bell"></i> الإشعارات</a>
                 <a href="profile.html" class="active"><i class="fas fa-user"></i> الملف الشخصي</a>
             </nav>
             <button class="sidebar-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
@@ -92,19 +84,15 @@ function buildSidebar(user) {
     }
 }
 
-/* ==============================
-   تحميل بيانات المستخدم
-   ============================== */
+// ========== تحميل بيانات المستخدم ==========
 function loadUserData(user) {
-    // عرض الاسم والبريد
     document.getElementById('displayName').textContent = user.fullName || 'المستخدم';
     document.getElementById('displayEmail').textContent = user.email || '';
     document.getElementById('avatarInitial').textContent = (user.fullName || 'U')[0].toUpperCase();
-    document.getElementById('userAvatar').style.background = user.type === 'tech' ? 
-        'linear-gradient(135deg, #10B981, #059669)' : 
+    document.getElementById('userAvatar').style.background = user.type === 'tech' ?
+        'linear-gradient(135deg, #10B981, #059669)' :
         'linear-gradient(135deg, #2563EB, #1E3A8A)';
 
-    // تعبئة النموذج
     document.getElementById('fullName').value = user.fullName || '';
     document.getElementById('email').value = user.email || '';
     document.getElementById('phone').value = user.phone || '';
@@ -125,15 +113,14 @@ function loadUserData(user) {
     document.getElementById('maintenanceReminders').checked = settings.maintenanceReminders !== false;
 }
 
-/* ==============================
-   حفظ المعلومات الشخصية
-   ============================== */
+// ========== حفظ المعلومات الشخصية ==========
 function savePersonalInfo(e) {
     e.preventDefault();
 
     const fullName = document.getElementById('fullName').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
+    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
 
     if (!fullName || !email || !phone) {
         showNotification('الرجاء إدخال جميع البيانات المطلوبة', 'error');
@@ -145,48 +132,56 @@ function savePersonalInfo(e) {
         return;
     }
 
-    // تحديث بيانات الجلسة
-    let currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    currentUser.fullName = fullName;
-    currentUser.email = email;
-    currentUser.phone = phone;
+    const updatedData = {
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+    };
 
     if (currentUser.type === 'tech') {
-        currentUser.specialization = document.getElementById('specialization').value;
-        currentUser.experience = document.getElementById('experience').value;
-        currentUser.location = document.getElementById('location').value;
-        currentUser.about = document.getElementById('about').value.trim();
+        updatedData.specialization = document.getElementById('specialization')?.value || '';
+        updatedData.experience = document.getElementById('experience')?.value || '';
+        updatedData.location = document.getElementById('location')?.value || '';
+        updatedData.about = document.getElementById('about')?.value.trim() || '';
     }
 
-    localStorage.setItem('shakhesly_current_user', JSON.stringify(currentUser));
+    // تحديث في Firebase
+    db.ref('users/' + currentUser.id).update(updatedData)
+        .then(() => {
+            // تحديث الجلسة المحلية
+            localStorage.setItem('shakhesly_current_user', JSON.stringify({
+                ...currentUser,
+                fullName: fullName,
+                email: email,
+                phone: phone,
+                specialization: updatedData.specialization || currentUser.specialization || '',
+                experience: updatedData.experience || currentUser.experience || '',
+                location: updatedData.location || currentUser.location || '',
+                about: updatedData.about || currentUser.about || ''
+            }));
 
-    // تحديث في قائمة المستخدمين
-    let users = JSON.parse(localStorage.getItem('shakhesly_users')) || [];
-    users = users.map(u => {
-        if (u.id === currentUser.id || u.email === currentUser.email) {
-            return { ...u, ...currentUser, password: u.password };
-        }
-        return u;
-    });
-    localStorage.setItem('shakhesly_users', JSON.stringify(users));
+            // تحديث العرض
+            document.getElementById('displayName').textContent = fullName;
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('avatarInitial').textContent = fullName[0].toUpperCase();
 
-    // تحديث العرض
-    document.getElementById('displayName').textContent = fullName;
-    document.getElementById('displayEmail').textContent = email;
-    document.getElementById('avatarInitial').textContent = fullName[0].toUpperCase();
-
-    showNotification('تم حفظ التغييرات بنجاح ✅', 'success');
+            showNotification('تم حفظ التغييرات بنجاح ✅', 'success');
+        })
+        .catch(err => {
+            console.error('خطأ في الحفظ:', err);
+            showNotification('❌ حدث خطأ أثناء الحفظ', 'error');
+        });
 }
 
-/* ==============================
-   تغيير كلمة المرور
-   ============================== */
+// ========== تغيير كلمة المرور ==========
 function changePassword(e) {
     e.preventDefault();
 
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
 
     if (newPassword.length < 6) {
         showNotification('كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل', 'error');
@@ -198,40 +193,60 @@ function changePassword(e) {
         return;
     }
 
-    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    let users = JSON.parse(localStorage.getItem('shakhesly_users')) || [];
-    
-    const userInDB = users.find(u => u.email === currentUser.email);
-    
-    if (userInDB && userInDB.password !== currentPassword) {
-        showNotification('كلمة المرور الحالية غير صحيحة', 'error');
-        return;
-    }
+    // جلب بيانات المستخدم من Firebase للتحقق من كلمة المرور القديمة
+    db.ref('users/' + currentUser.id).once('value')
+        .then(snapshot => {
+            const userData = snapshot.val();
+            if (!userData) {
+                showNotification('❌ حدث خطأ. الرجاء تسجيل الخروج والمحاولة مرة أخرى.', 'error');
+                return;
+            }
 
-    // تحديث كلمة المرور
-    users = users.map(u => {
-        if (u.email === currentUser.email) {
-            u.password = newPassword;
-        }
-        return u;
-    });
-    localStorage.setItem('shakhesly_users', JSON.stringify(users));
+            // التحقق من كلمة المرور القديمة
+            let isPasswordCorrect = false;
+            try {
+                if (typeof CryptoJS !== 'undefined') {
+                    const decrypted = CryptoJS.AES.decrypt(userData.password, 'ShakheslyAI2024SecretKey!@#').toString(CryptoJS.enc.Utf8);
+                    isPasswordCorrect = (decrypted === currentPassword);
+                } else {
+                    isPasswordCorrect = (userData.password === currentPassword);
+                }
+            } catch (e) {
+                isPasswordCorrect = (userData.password === currentPassword);
+            }
 
-    document.getElementById('passwordForm').reset();
-    document.getElementById('strengthBar').style.width = '0';
-    document.getElementById('strengthText').textContent = 'قوة كلمة المرور';
+            if (!isPasswordCorrect) {
+                showNotification('كلمة المرور الحالية غير صحيحة', 'error');
+                return;
+            }
 
-    showNotification('تم تغيير كلمة المرور بنجاح 🔒', 'success');
+            // تشفير كلمة المرور الجديدة
+            let encryptedPassword = newPassword;
+            if (typeof CryptoJS !== 'undefined') {
+                encryptedPassword = CryptoJS.AES.encrypt(newPassword, 'ShakheslyAI2024SecretKey!@#').toString();
+            }
+
+            // تحديث كلمة المرور في Firebase
+            return db.ref('users/' + currentUser.id).update({ password: encryptedPassword });
+        })
+        .then(() => {
+            document.getElementById('passwordForm').reset();
+            document.getElementById('strengthBar').style.width = '0';
+            document.getElementById('strengthText').textContent = 'قوة كلمة المرور';
+            showNotification('تم تغيير كلمة المرور بنجاح 🔒', 'success');
+        })
+        .catch(err => {
+            console.error('خطأ في تغيير كلمة المرور:', err);
+            showNotification('❌ حدث خطأ. حاول مرة أخرى.', 'error');
+        });
 }
 
-/* ==============================
-   قوة كلمة المرور
-   ============================== */
+// ========== قوة كلمة المرور ==========
 function checkPasswordStrength() {
     const password = document.getElementById('newPassword').value;
     const bar = document.getElementById('strengthBar');
     const text = document.getElementById('strengthText');
-    
+
     let strength = 0;
     if (password.length >= 6) strength++;
     if (password.length >= 8) strength++;
@@ -241,29 +256,25 @@ function checkPasswordStrength() {
 
     const colors = ['#EF4444', '#F59E0B', '#F59E0B', '#10B981', '#10B981'];
     const texts = ['ضعيفة جداً', 'ضعيفة', 'متوسطة', 'قوية', 'قوية جداً'];
-    
+
     bar.style.width = (strength * 20) + '%';
-    bar.style.background = colors[strength];
-    text.textContent = texts[strength];
+    bar.style.background = colors[strength] || colors[4];
+    text.textContent = texts[strength] || texts[4];
 }
 
-/* ==============================
-   حفظ الإعدادات
-   ============================== */
+// ========== حفظ الإعدادات ==========
 function saveSettings() {
     const settings = {
         notifications: document.getElementById('notificationsEnabled').checked,
         emailNotifications: document.getElementById('emailNotifications').checked,
         maintenanceReminders: document.getElementById('maintenanceReminders').checked
     };
-    
+
     localStorage.setItem('shakhesly_settings', JSON.stringify(settings));
     showNotification('تم حفظ الإعدادات ⚙️', 'success');
 }
 
-/* ==============================
-   حذف الحساب
-   ============================== */
+// ========== حذف الحساب ==========
 function openDeleteModal() {
     document.getElementById('deleteAccountModal').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -277,39 +288,32 @@ function closeDeleteModal() {
 function deleteAccount() {
     const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
 
-    // حذف من قائمة المستخدمين
-    let users = JSON.parse(localStorage.getItem('shakhesly_users')) || [];
-    users = users.filter(u => u.email !== currentUser.email);
-    localStorage.setItem('shakhesly_users', JSON.stringify(users));
+    if (!currentUser.id) {
+        showNotification('❌ حدث خطأ. الرجاء تسجيل الخروج والمحاولة مرة أخرى.', 'error');
+        return;
+    }
 
-    // حذف الأجهزة
-    let devices = JSON.parse(localStorage.getItem('shakhesly_devices')) || [];
-    devices = devices.filter(d => d.userId !== currentUser.id);
-    localStorage.setItem('shakhesly_devices', JSON.stringify(devices));
-
-    // حذف الطلبات
-    let orders = JSON.parse(localStorage.getItem('shakhesly_orders')) || [];
-    orders = orders.filter(o => o.userId !== currentUser.id && o.techId !== currentUser.id);
-    localStorage.setItem('shakhesly_orders', JSON.stringify(orders));
-
-    // حذف الجلسة
-    localStorage.removeItem('shakhesly_current_user');
-    localStorage.removeItem('shakhesly_settings');
-
-    window.location.href = 'index.html';
+    // حذف من Firebase
+    db.ref('users/' + currentUser.id).remove()
+        .then(() => {
+            // حذف الجلسة المحلية
+            localStorage.removeItem('shakhesly_current_user');
+            localStorage.removeItem('shakhesly_settings');
+            window.location.href = 'index.html';
+        })
+        .catch(err => {
+            console.error('خطأ في حذف الحساب:', err);
+            showNotification('❌ حدث خطأ أثناء حذف الحساب', 'error');
+        });
 }
 
-/* ==============================
-   تسجيل الخروج
-   ============================== */
+// ========== تسجيل الخروج ==========
 function logout() {
     localStorage.removeItem('shakhesly_current_user');
     window.location.href = 'index.html';
 }
 
-/* ==============================
-   إشعارات
-   ============================== */
+// ========== إشعارات ==========
 function showNotification(message, type) {
     document.querySelectorAll('.notification').forEach(n => n.remove());
     const bg = type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#2563EB';
@@ -318,7 +322,8 @@ function showNotification(message, type) {
     Object.assign(n.style, {
         position: 'fixed', top: '30px', left: '50%', transform: 'translateX(-50%)',
         background: bg, color: 'white', padding: '14px 24px', borderRadius: '50px',
-        zIndex: '9999', fontWeight: '700', fontSize: '0.95rem', boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+        zIndex: '9999', fontWeight: '700', fontSize: '0.95rem',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
     });
     document.body.appendChild(n);
     setTimeout(() => { n.style.opacity = '0'; n.style.transition = '0.3s'; setTimeout(() => n.remove(), 300); }, 3000);
