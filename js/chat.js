@@ -1,78 +1,63 @@
-
-/* ============================================
-   شخصلي AI - تفاعلات صفحة الشات
-   ============================================ */
-
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // ========== جلب بيانات المحادثة من الرابط ==========
+// ========== المحادثة - Firebase ==========
+document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
-    const orderId = parseInt(params.get('orderId'));
-    const chatWithId = parseInt(params.get('userId'));
+    const orderId = params.get('orderId');
+    const chatWithId = params.get('userId');
     const chatWithName = params.get('name') || 'المستخدم';
     const chatWithType = params.get('type') || 'user';
-    
+
     if (!orderId || !chatWithId) {
         document.getElementById('chatName').textContent = 'خطأ في تحميل المحادثة';
         return;
     }
-    
+
     const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    if (!currentUser) {
-        window.location.href = 'index.html';
-        return;
-    }
-    
-    // ===== إعداد واجهة الشات =====
+    if (!currentUser) { window.location.href = 'index.html'; return; }
+
     document.getElementById('chatName').textContent = chatWithName;
     document.getElementById('chatAvatar').textContent = chatWithType === 'tech' ? '🔧' : '👤';
     document.getElementById('orderBadge').textContent = `طلب #${orderId}`;
     document.getElementById('todayDate').textContent = new Date().toLocaleDateString('ar-EG', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
-    
-    // ===== زر الرجوع =====
+
     if (currentUser.type === 'tech') {
         document.getElementById('btnBack').href = 'incoming-orders.html';
     } else {
         document.getElementById('btnBack').href = 'orders.html';
     }
-    
-    // ===== تحميل الرسائل =====
-    loadMessages();
-    
-    // ===== إرسال رسالة =====
-    document.getElementById('btnSend').addEventListener('click', sendMessage);
-    document.getElementById('messageInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
+
+    loadMessages(orderId);
+
+    document.getElementById('btnSend').addEventListener('click', () => sendMessage(orderId, chatWithId, currentUser));
+    document.getElementById('messageInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') sendMessage(orderId, chatWithId, currentUser);
     });
-    
-    // ===== تحديث تلقائي كل 3 ثواني =====
-    setInterval(loadMessages, 3000);
-    
-    // ===== تمرير للأسفل =====
-    scrollToBottom();
+
+    // تحديث تلقائي كل 3 ثوانٍ
+    setInterval(() => loadMessages(orderId), 3000);
 });
 
-/* ==============================
-   جلب الرسائل
-   ============================== */
-function getMessages() {
-    const params = new URLSearchParams(window.location.search);
-    const orderId = parseInt(params.get('orderId'));
-    const allMessages = JSON.parse(localStorage.getItem('shakhesly_messages')) || [];
-    return allMessages.filter(m => m.orderId === orderId).sort((a, b) => a.id - b.id);
+function loadMessages(orderId) {
+    db.ref('messages')
+        .orderByChild('orderId')
+        .equalTo(orderId)
+        .once('value')
+        .then(snapshot => {
+            const messages = [];
+            snapshot.forEach(child => {
+                messages.push({ id: child.key, ...child.val() });
+            });
+            messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+            renderMessages(messages);
+        });
 }
 
-/* ==============================
-   تحميل وعرض الرسائل
-   ============================== */
-function loadMessages() {
-    const messages = getMessages();
+function renderMessages(messages) {
     const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
     const container = document.getElementById('chatMessages');
-    const dateHTML = `<div class="chat-date"><span id="todayDate">${new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>`;
-    
+    const dateHTML = `<div class="chat-date"><span>${new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></div>`;
+
     if (messages.length === 0) {
         container.innerHTML = dateHTML + `
             <div class="empty-chat">
@@ -83,8 +68,7 @@ function loadMessages() {
     } else {
         container.innerHTML = dateHTML + messages.map(msg => {
             const isSent = msg.senderId === currentUser.id;
-            const time = new Date(msg.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-            
+            const time = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '';
             return `
                 <div class="message ${isSent ? 'sent' : 'received'}">
                     <div class="message-bubble">
@@ -95,51 +79,22 @@ function loadMessages() {
             `;
         }).join('');
     }
-    
-    // مش عايزين نعمل سكرول تلقائي عشان متضايقش المستخدم لو بيقرأ رسايل قديمة
 }
 
-/* ==============================
-   إرسال رسالة جديدة
-   ============================== */
-function sendMessage() {
+function sendMessage(orderId, receiverId, currentUser) {
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
-    
     if (!text) return;
-    
-    const params = new URLSearchParams(window.location.search);
-    const orderId = parseInt(params.get('orderId'));
-    const chatWithId = parseInt(params.get('userId'));
-    const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-    
-    const allMessages = JSON.parse(localStorage.getItem('shakhesly_messages')) || [];
-    
-    allMessages.push({
-        id: Date.now(),
+
+    db.ref('messages').push({
         orderId: orderId,
         senderId: currentUser.id,
-        receiverId: chatWithId,
+        receiverId: receiverId,
         text: text,
-        createdAt: new Date().toISOString()
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        input.value = '';
+        loadMessages(orderId);
+        input.focus();
     });
-    
-    localStorage.setItem('shakhesly_messages', JSON.stringify(allMessages));
-    
-    input.value = '';
-    loadMessages();
-    scrollToBottom();
-    
-    // تركيز على الإدخال تاني
-    input.focus();
 }
-
-/* ==============================
-   تمرير للأسفل
-   ============================== */
-function scrollToBottom() {
-    const container = document.getElementById('chatMessages');
-    setTimeout(() => {
-        container.scrollTop = container.scrollHeight;
-    }, 100);
-} 
