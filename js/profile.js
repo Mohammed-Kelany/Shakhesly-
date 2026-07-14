@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
     if (!currentUser) { window.location.href = 'index.html'; return; }
 
+    if (typeof AOS !== 'undefined') AOS.init({ duration: 600, once: true });
+
     buildSidebar(currentUser);
 
     // تحميل بيانات المستخدم من Firebase
@@ -10,11 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
         db.ref('users/' + currentUser.id).once('value').then(snapshot => {
             const userData = snapshot.val();
             if (userData) {
-                // دمج بيانات الجلسة مع بيانات Firebase
                 const fullUser = { ...currentUser, ...userData, id: currentUser.id };
                 loadUserData(fullUser);
             } else {
-                // إذا لم توجد بيانات في Firebase، استخدم بيانات الجلسة
                 loadUserData(currentUser);
             }
         });
@@ -29,20 +29,18 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             this.classList.add('active');
             const target = this.getAttribute('data-tab');
-            document.getElementById(`tab-${target}`).classList.add('active');
+            const targetEl = document.getElementById('tab-' + target);
+            if (targetEl) targetEl.classList.add('active');
         });
     });
 
     // حفظ المعلومات الشخصية
     document.getElementById('infoForm')?.addEventListener('submit', savePersonalInfo);
-
     // تغيير كلمة المرور
     document.getElementById('passwordForm')?.addEventListener('submit', changePassword);
     document.getElementById('newPassword')?.addEventListener('input', checkPasswordStrength);
-
     // حفظ الإعدادات
     document.getElementById('btnSaveSettings')?.addEventListener('click', saveSettings);
-
     // حذف الحساب
     document.getElementById('btnDeleteAccount')?.addEventListener('click', openDeleteModal);
     document.getElementById('modalCloseDelete')?.addEventListener('click', closeDeleteModal);
@@ -56,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // ========== بناء الشريط الجانبي ==========
 function buildSidebar(user) {
     const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
     if (user.type === 'tech') {
         sidebar.innerHTML = `
             <div class="sidebar-logo"><img src="assets/images/logo.png" alt="شخصلي" style="height:32px;width:auto;"></div>
@@ -97,7 +96,6 @@ function loadUserData(user) {
     document.getElementById('email').value = user.email || '';
     document.getElementById('phone').value = user.phone || '';
 
-    // حقول الفني
     if (user.type === 'tech') {
         document.getElementById('techFields').style.display = 'block';
         document.getElementById('specialization').value = user.specialization || '';
@@ -106,7 +104,6 @@ function loadUserData(user) {
         document.getElementById('about').value = user.about || '';
     }
 
-    // تحميل الإعدادات
     const settings = JSON.parse(localStorage.getItem('shakhesly_settings')) || {};
     document.getElementById('notificationsEnabled').checked = settings.notifications !== false;
     document.getElementById('emailNotifications').checked = settings.emailNotifications === true;
@@ -116,7 +113,6 @@ function loadUserData(user) {
 // ========== حفظ المعلومات الشخصية ==========
 function savePersonalInfo(e) {
     e.preventDefault();
-
     const fullName = document.getElementById('fullName').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -126,19 +122,15 @@ function savePersonalInfo(e) {
         showNotification('الرجاء إدخال جميع البيانات المطلوبة', 'error');
         return;
     }
-
     if (!email.includes('@') || !email.includes('.')) {
         showNotification('الرجاء إدخال بريد إلكتروني صحيح', 'error');
         return;
     }
 
     const updatedData = {
-        fullName: fullName,
-        email: email,
-        phone: phone,
+        fullName, email, phone,
         updatedAt: firebase.database.ServerValue.TIMESTAMP
     };
-
     if (currentUser.type === 'tech') {
         updatedData.specialization = document.getElementById('specialization')?.value || '';
         updatedData.experience = document.getElementById('experience')?.value || '';
@@ -146,26 +138,18 @@ function savePersonalInfo(e) {
         updatedData.about = document.getElementById('about')?.value.trim() || '';
     }
 
-    // تحديث في Firebase
     db.ref('users/' + currentUser.id).update(updatedData)
         .then(() => {
-            // تحديث الجلسة المحلية
             localStorage.setItem('shakhesly_current_user', JSON.stringify({
-                ...currentUser,
-                fullName: fullName,
-                email: email,
-                phone: phone,
+                ...currentUser, fullName, email, phone,
                 specialization: updatedData.specialization || currentUser.specialization || '',
                 experience: updatedData.experience || currentUser.experience || '',
                 location: updatedData.location || currentUser.location || '',
                 about: updatedData.about || currentUser.about || ''
             }));
-
-            // تحديث العرض
             document.getElementById('displayName').textContent = fullName;
             document.getElementById('displayEmail').textContent = email;
             document.getElementById('avatarInitial').textContent = fullName[0].toUpperCase();
-
             showNotification('تم حفظ التغييرات بنجاح ✅', 'success');
         })
         .catch(err => {
@@ -177,7 +161,6 @@ function savePersonalInfo(e) {
 // ========== تغيير كلمة المرور ==========
 function changePassword(e) {
     e.preventDefault();
-
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
@@ -187,22 +170,15 @@ function changePassword(e) {
         showNotification('كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل', 'error');
         return;
     }
-
     if (newPassword !== confirmPassword) {
         showNotification('كلمة المرور الجديدة غير متطابقة', 'error');
         return;
     }
 
-    // جلب بيانات المستخدم من Firebase للتحقق من كلمة المرور القديمة
     db.ref('users/' + currentUser.id).once('value')
         .then(snapshot => {
             const userData = snapshot.val();
-            if (!userData) {
-                showNotification('❌ حدث خطأ. الرجاء تسجيل الخروج والمحاولة مرة أخرى.', 'error');
-                return;
-            }
-
-            // التحقق من كلمة المرور القديمة
+            if (!userData) { showNotification('❌ حدث خطأ', 'error'); return; }
             let isPasswordCorrect = false;
             try {
                 if (typeof CryptoJS !== 'undefined') {
@@ -211,22 +187,12 @@ function changePassword(e) {
                 } else {
                     isPasswordCorrect = (userData.password === currentPassword);
                 }
-            } catch (e) {
-                isPasswordCorrect = (userData.password === currentPassword);
-            }
-
-            if (!isPasswordCorrect) {
-                showNotification('كلمة المرور الحالية غير صحيحة', 'error');
-                return;
-            }
-
-            // تشفير كلمة المرور الجديدة
+            } catch (e) { isPasswordCorrect = (userData.password === currentPassword); }
+            if (!isPasswordCorrect) { showNotification('كلمة المرور الحالية غير صحيحة', 'error'); return; }
             let encryptedPassword = newPassword;
             if (typeof CryptoJS !== 'undefined') {
                 encryptedPassword = CryptoJS.AES.encrypt(newPassword, 'ShakheslyAI2024SecretKey!@#').toString();
             }
-
-            // تحديث كلمة المرور في Firebase
             return db.ref('users/' + currentUser.id).update({ password: encryptedPassword });
         })
         .then(() => {
@@ -235,10 +201,7 @@ function changePassword(e) {
             document.getElementById('strengthText').textContent = 'قوة كلمة المرور';
             showNotification('تم تغيير كلمة المرور بنجاح 🔒', 'success');
         })
-        .catch(err => {
-            console.error('خطأ في تغيير كلمة المرور:', err);
-            showNotification('❌ حدث خطأ. حاول مرة أخرى.', 'error');
-        });
+        .catch(err => { console.error(err); showNotification('❌ حدث خطأ', 'error'); });
 }
 
 // ========== قوة كلمة المرور ==========
@@ -246,17 +209,14 @@ function checkPasswordStrength() {
     const password = document.getElementById('newPassword').value;
     const bar = document.getElementById('strengthBar');
     const text = document.getElementById('strengthText');
-
     let strength = 0;
     if (password.length >= 6) strength++;
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
     if (/[^A-Za-z0-9]/.test(password)) strength++;
-
     const colors = ['#EF4444', '#F59E0B', '#F59E0B', '#10B981', '#10B981'];
     const texts = ['ضعيفة جداً', 'ضعيفة', 'متوسطة', 'قوية', 'قوية جداً'];
-
     bar.style.width = (strength * 20) + '%';
     bar.style.background = colors[strength] || colors[4];
     text.textContent = texts[strength] || texts[4];
@@ -269,7 +229,6 @@ function saveSettings() {
         emailNotifications: document.getElementById('emailNotifications').checked,
         maintenanceReminders: document.getElementById('maintenanceReminders').checked
     };
-
     localStorage.setItem('shakhesly_settings', JSON.stringify(settings));
     showNotification('تم حفظ الإعدادات ⚙️', 'success');
 }
@@ -279,32 +238,20 @@ function openDeleteModal() {
     document.getElementById('deleteAccountModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
-
 function closeDeleteModal() {
     document.getElementById('deleteAccountModal').classList.remove('active');
     document.body.style.overflow = '';
 }
-
 function deleteAccount() {
     const currentUser = JSON.parse(localStorage.getItem('shakhesly_current_user'));
-
-    if (!currentUser.id) {
-        showNotification('❌ حدث خطأ. الرجاء تسجيل الخروج والمحاولة مرة أخرى.', 'error');
-        return;
-    }
-
-    // حذف من Firebase
+    if (!currentUser.id) { showNotification('❌ حدث خطأ', 'error'); return; }
     db.ref('users/' + currentUser.id).remove()
         .then(() => {
-            // حذف الجلسة المحلية
             localStorage.removeItem('shakhesly_current_user');
             localStorage.removeItem('shakhesly_settings');
             window.location.href = 'index.html';
         })
-        .catch(err => {
-            console.error('خطأ في حذف الحساب:', err);
-            showNotification('❌ حدث خطأ أثناء حذف الحساب', 'error');
-        });
+        .catch(err => { console.error(err); showNotification('❌ حدث خطأ', 'error'); });
 }
 
 // ========== تسجيل الخروج ==========
@@ -327,4 +274,4 @@ function showNotification(message, type) {
     });
     document.body.appendChild(n);
     setTimeout(() => { n.style.opacity = '0'; n.style.transition = '0.3s'; setTimeout(() => n.remove(), 300); }, 3000);
-} 
+}
