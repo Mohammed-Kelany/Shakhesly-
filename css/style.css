@@ -106,7 +106,7 @@ button { cursor: pointer; border: none; font-family: var(--font-primary); }
     z-index: 0;
     display: block;
 }
-.method-card:nth-child(1)::before { background-image: url('assets/images/bg-keyboard.png'); }
+.method-card:nth-child(1)::before { background-image: url('.. /assets/images/bg-keyboard.png'); }
 .method-card:nth-child(2)::before { background-image: url('assets/images/bg-microphone.png'); }
 .method-card:nth-child(3)::before { background-image: url('assets/images/bg-camera.png'); }
 .method-card:hover::before { opacity: 0.20; transform: scale(1.05); }
