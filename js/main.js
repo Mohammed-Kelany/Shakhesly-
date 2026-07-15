@@ -381,3 +381,12 @@ function initExtraEffects() {
 console.log('✅ main.js تم التحميل - الإصدار 9.0');
 console.log('📋 عدد المستخدمين:', (JSON.parse(localStorage.getItem('shakhesly_users')) || []).length); 
 
+// 🆕 إرسال Push Notification
+function sendPushNotification(title, body) {
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body: body, icon: 'assets/images/icon-192.png' });
+  }
+}
+
+// استخدامها في checkMaintenanceReminders:
+sendPushNotification('🔧 تذكير صيانة', 'موعد الصيانة الدورية لجهاز ' + deviceName + ' بعد ' + days + ' يوم');
