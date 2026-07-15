@@ -372,7 +372,7 @@
     Notification.requestPermission().then(function(permission) {
       if (permission === 'granted') {
         console.log('✅ تم منح إذن الإشعارات');
-        messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY' }).then(function(token) {
+        messaging.getToken({ vapidKey: 'BDVg7XEvrmG5LZRZFa4FXYxiWj-Ydjazd1etV03rdrYOeKkqpYDcC-0S9nd75hLtUN3c492IEESVYv4GRIfckY0' }).then(function(token) {
           console.log('📱 Token:', token);
           // حفظ التوكن في Firebase للمستخدم الحالي
           const user = JSON.parse(localStorage.getItem('shakhesly_current_user'));
