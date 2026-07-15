@@ -361,6 +361,39 @@
                 navigator.serviceWorker.register('sw.js');
             });
         }
-    </script>
+    </script> 
+    <!-- Firebase Messaging -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+<script>
+  const messaging = firebase.messaging();
+  
+  // طلب إذن الإشعارات
+  function requestNotificationPermission() {
+    Notification.requestPermission().then(function(permission) {
+      if (permission === 'granted') {
+        console.log('✅ تم منح إذن الإشعارات');
+        messaging.getToken({ vapidKey: 'YOUR_VAPID_KEY' }).then(function(token) {
+          console.log('📱 Token:', token);
+          // حفظ التوكن في Firebase للمستخدم الحالي
+          const user = JSON.parse(localStorage.getItem('shakhesly_current_user'));
+          if (user && user.id) {
+            db.ref('users/' + user.id).update({ fcmToken: token });
+          }
+        });
+      } else {
+        console.log('❌ تم رفض إذن الإشعارات');
+      }
+    });
+  }
+  
+  // استقبال الإشعارات والمتصفح مفتوح
+  messaging.onMessage(function(payload) {
+    console.log('📩 إشعار:', payload);
+    alert(payload.notification.title + '\n' + payload.notification.body);
+  });
+  
+  // طلب الإذن أول ما يفتح الموقع
+  requestNotificationPermission();
+</script>
 </body>
 </html>
