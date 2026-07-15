@@ -160,7 +160,7 @@ function addLanguageToggle() {
     
     var langBtn = document.createElement('button');
     langBtn.className = 'btn btn-outline';
-    langBtn.style.cssText = 'padding:8px 8px;font-size:0.85rem;';
+    langBtn.style.cssText = 'padding:6px 12px;font-size:0.8rem;';
     langBtn.innerHTML = currentLang === 'ar' ? '🇬🇧 EN' : '🇸🇦 AR';
     langBtn.title = currentLang === 'ar' ? 'Switch to English' : 'التبديل للعربية';
     
