@@ -15,10 +15,9 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage(function(payload) {
-  console.log('📩 إشعار في الخلفية:', payload);
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.notification.title || 'شخصلي AI';
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.notification.body || 'لديك إشعار جديد',
     icon: 'assets/images/icon-192.png'
   };
   self.registration.showNotification(notificationTitle, notificationOptions);
